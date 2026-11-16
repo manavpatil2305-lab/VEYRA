@@ -18,7 +18,7 @@
     <div id="login-screen" class="h-full flex flex-col items-center justify-center px-6 absolute top-0 left-0 w-full bg-[#0B141A] z-50">
         <h1 class="text-4xl font-bold text-white mb-8">veyra</h1>
         <p class="text-gray-400 mb-8 text-center">Sign in securely to start messaging</p>
-        <button id="google-login-btn" class="w-full max-w-sm bg-white text-black font-bold py-3 px-4 rounded-full shadow-lg flex items-center justify-center gap-3">
+        <button id="google-login-btn" class="w-full max-w-sm bg-white text-black font-bold py-3 px-4 rounded-full shadow-lg flex items-center justify-center gap-3 cursor-pointer">
             <svg class="w-6 h-6" viewBox="0 0 24 24">
                 <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
                 <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
@@ -29,7 +29,7 @@
         </button>
     </div>
 
-    <!-- CHOOSE USERNAME SCREEN (Shows only for new users) -->
+    <!-- CHOOSE USERNAME SCREEN -->
     <div id="username-screen" class="hidden h-full flex flex-col items-center justify-center px-6 absolute top-0 left-0 w-full bg-[#0B141A] z-50">
         <h2 class="text-2xl font-bold text-white mb-2">Create your Veyra ID</h2>
         <p class="text-gray-400 mb-8 text-center text-sm">This is how friends will find you. No emails shared.</p>
@@ -37,7 +37,7 @@
             <span class="text-gray-500 font-bold">@</span>
             <input type="text" id="username-input" placeholder="manav_23" class="bg-transparent outline-none text-white w-full lowercase">
         </div>
-        <button id="save-username-btn" class="w-full max-w-sm bg-[#25D366] text-[#0B141A] font-bold py-3 rounded-full">Complete Profile</button>
+        <button id="save-username-btn" class="w-full max-w-sm bg-[#25D366] text-[#0B141A] font-bold py-3 rounded-full cursor-pointer">Complete Profile</button>
     </div>
 
     <!-- MAIN APP UI -->
@@ -98,7 +98,7 @@
                 </select>
             </div>
         </div>
-        <div class="p-4"><button id="logout-btn" class="w-full bg-red-600/20 text-red-500 font-bold py-3 rounded-xl">Log Out</button></div>
+        <div class="p-4"><button id="logout-btn" class="w-full bg-red-600/20 text-red-500 font-bold py-3 rounded-xl cursor-pointer">Log Out</button></div>
     </div>
 
     <!-- PRIVATE CHAT ROOM UI -->
@@ -146,7 +146,6 @@
         let activeChatId = null; 
         let currentChatListener = null;
 
-        // UI Variables
         const loginScreen = document.getElementById('login-screen');
         const usernameScreen = document.getElementById('username-screen');
         const mainApp = document.getElementById('main-app');
@@ -154,14 +153,18 @@
         const searchInput = document.getElementById('search-users-input');
         const searchResults = document.getElementById('search-results');
         
-        // 1. Auth Flow & Username Check
+        // Instant Auth State Handler
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 currentUser = user;
+                // Hide login screen instantly
+                loginScreen.classList.add('hidden');
+                loginScreen.classList.remove('flex');
+
+                // Check username in background
                 const userDoc = await getDoc(doc(db, "users", user.uid));
                 
                 if (userDoc.exists() && userDoc.data().username) {
-                    // User already has a username, load app
                     currentUserData = userDoc.data();
                     document.getElementById('settings-name').textContent = currentUserData.name;
                     document.getElementById('settings-username').textContent = "@" + currentUserData.username;
@@ -169,7 +172,6 @@
                     
                     showScreen(mainApp);
                 } else {
-                    // New User - Must pick a username
                     showScreen(usernameScreen);
                 }
             } else {
@@ -185,7 +187,6 @@
             const rawUsername = document.getElementById('username-input').value.trim().toLowerCase();
             if(rawUsername.length < 3) return alert("Username must be at least 3 characters");
 
-            // Save new user profile to Firestore
             await setDoc(doc(db, "users", currentUser.uid), {
                 uid: currentUser.uid,
                 name: currentUser.displayName,
@@ -194,12 +195,12 @@
                 username: rawUsername,
                 joinedAt: serverTimestamp()
             });
-            window.location.reload(); // Reload to apply data
+            window.location.reload();
         });
 
         document.getElementById('logout-btn').addEventListener('click', () => signOut(auth));
 
-        // 2. Search Users Logic (Insta/Snap Style)
+        // Search Users
         searchInput.addEventListener('input', async (e) => {
             const val = e.target.value.trim().toLowerCase();
             if(val.length < 2) { searchResults.classList.add('hidden'); return; }
@@ -212,7 +213,7 @@
 
             querySnapshot.forEach((docSnap) => {
                 const userObj = docSnap.data();
-                if(userObj.uid === currentUser.uid) return; // Don't show yourself
+                if(userObj.uid === currentUser.uid) return;
                 found = true;
                 
                 const div = document.createElement('div');
@@ -224,7 +225,6 @@
                         <p class="text-xs text-[#25D366]">@${userObj.username}</p>
                     </div>
                 `;
-                // Click a user to start private chat
                 div.addEventListener('click', () => openPrivateChat(userObj));
                 searchResults.appendChild(div);
             });
@@ -233,21 +233,17 @@
             searchResults.classList.remove('hidden');
         });
 
-        // Hide search when clicking outside
         document.addEventListener('click', (e) => {
             if(e.target !== searchInput) searchResults.classList.add('hidden');
         });
 
-        // 3. Private 1-on-1 Chat Logic
         function openPrivateChat(otherUser) {
             searchInput.value = "";
             searchResults.classList.add('hidden');
             
-            // Create a unique Chat ID based on both UIDs
             const uids = [currentUser.uid, otherUser.uid].sort();
             activeChatId = `${uids[0]}_${uids[1]}`;
 
-            // Update Header
             document.getElementById('chat-header-name').textContent = otherUser.name;
             document.getElementById('chat-header-username').textContent = "@" + otherUser.username;
             if(otherUser.photoUrl) document.getElementById('chat-header-pic').style.backgroundImage = `url('${otherUser.photoUrl}')`;
@@ -257,7 +253,7 @@
         }
 
         document.getElementById('back-btn').addEventListener('click', () => {
-            if(currentChatListener) currentChatListener(); // Stop listening to old chat
+            if(currentChatListener) currentChatListener();
             activeChatId = null;
             showScreen(mainApp);
         });
@@ -284,7 +280,7 @@
             const messagesArea = document.getElementById('messages-area');
             const q = query(collection(db, `chats/${activeChatId}/messages`), orderBy("timestamp", "asc"));
             
-            if(currentChatListener) currentChatListener(); // clear previous listener
+            if(currentChatListener) currentChatListener();
 
             currentChatListener = onSnapshot(q, (snapshot) => {
                 messagesArea.innerHTML = ""; 
@@ -309,7 +305,6 @@
             });
         }
 
-        // Navigation Helper
         function showScreen(screenEl) {
             [loginScreen, usernameScreen, mainApp, document.getElementById('settings-screen'), chatRoom].forEach(el => {
                 if(el) { el.classList.add('hidden'); el.classList.remove('flex'); }
@@ -320,7 +315,6 @@
 
         document.getElementById('nav-settings').addEventListener('click', () => showScreen(document.getElementById('settings-screen')));
         document.getElementById('nav-chats').addEventListener('click', () => showScreen(mainApp));
-
     </script>
 </body>
 </html>
