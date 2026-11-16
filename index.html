@@ -14,19 +14,30 @@
 </head>
 <body class="bg-[#0B141A] text-[#E9EDEF] font-sans h-screen flex flex-col overflow-hidden">
 
-    <!-- LOGIN SCREEN (Hidden by default until we wire up Firebase) -->
-    <div id="login-screen" class="hidden h-full flex flex-col items-center justify-center px-6">
+    <!-- LOGIN SCREEN (Visible by default until logged in) -->
+    <div id="login-screen" class="h-full flex flex-col items-center justify-center px-6">
         <h1 class="text-4xl font-bold text-white mb-8">veyra</h1>
         <p class="text-gray-400 mb-6 text-center">Enter your phone number to get started</p>
+        
         <div class="w-full max-w-sm bg-[#202C33] rounded-lg p-4 flex items-center gap-3 mb-6">
             <span class="text-white border-r border-gray-600 pr-3">+91</span>
             <input type="tel" id="phone-input" placeholder="Phone number" class="bg-transparent outline-none text-white w-full">
         </div>
+        
+        <!-- Recaptcha Container for Firebase Phone Auth -->
+        <div id="recaptcha-container" class="mb-4"></div>
+        
         <button id="send-otp-btn" class="w-full max-w-sm bg-[#25D366] text-[#0B141A] font-bold py-3 rounded-full shadow-lg">Send OTP</button>
+
+        <!-- Hidden OTP Input section -->
+        <div id="otp-section" class="w-full max-w-sm hidden mt-6 flex-col items-center">
+            <input type="text" id="otp-input" placeholder="Enter 6-digit OTP" class="bg-[#202C33] outline-none text-white w-full rounded-lg p-4 mb-4 text-center tracking-widest">
+            <button id="verify-otp-btn" class="w-full bg-[#25D366] text-[#0B141A] font-bold py-3 rounded-full shadow-lg">Verify OTP</button>
+        </div>
     </div>
 
-    <!-- MAIN APP UI -->
-    <div id="main-app" class="flex flex-col h-full w-full">
+    <!-- MAIN APP UI (Hidden until verified) -->
+    <div id="main-app" class="hidden flex-col h-full w-full">
         <!-- Top Header -->
         <header class="pt-4 pb-2 px-4 flex justify-between items-center bg-[#0B141A]">
             <h1 class="text-2xl font-bold text-white">veyra</h1>
@@ -51,12 +62,6 @@
                     <div class="absolute bottom-0 right-0 w-4 h-4 bg-[#25D366] border-2 border-[#0B141A] rounded-full"></div>
                 </div>
                 <span class="text-xs text-gray-300">Rahul</span>
-            </div>
-            <div class="flex flex-col items-center gap-1 flex-shrink-0 relative">
-                <div class="w-14 h-14 bg-gray-700 rounded-full border-2 border-[#0B141A] relative">
-                    <div class="absolute bottom-0 right-0 w-4 h-4 bg-[#25D366] border-2 border-[#0B141A] rounded-full"></div>
-                </div>
-                <span class="text-xs text-gray-300">Ankit</span>
             </div>
         </div>
 
@@ -103,5 +108,30 @@
         </nav>
     </div>
 
+    <!-- Firebase SDK Connections -->
+    <script type="module">
+        // Import Firebase modules for version 13.3.0
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-app.js";
+        import { getAuth, RecaptchaVerifier, signInWithPhoneNumber } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-firestore.js";
+
+        // Firebase configuration from your console
+        const firebaseConfig = {
+            apiKey: "AIzaSyCAqrAiYLLnFoa_JmU8A3jXPk0KoZukCVk",
+            authDomain: "veyra-chatbox.firebaseapp.com",
+            projectId: "veyra-chatbox",
+            storageBucket: "veyra-chatbox.firebasestorage.app",
+            messagingSenderId: "443166587498",
+            appId: "1:443166587498:web:75577c5660eae841566813",
+            measurementId: "G-64PK736T85"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        console.log("Firebase 13.3.0 Initialized successfully");
+    </script>
 </body>
 </html>
