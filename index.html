@@ -108,14 +108,12 @@
         </nav>
     </div>
 
-    <!-- Firebase SDK Connections -->
+    <!-- Firebase SDK Connections & Auth Logic -->
     <script type="module">
-        // Import Firebase modules for version 13.3.0
         import { initializeApp } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-app.js";
         import { getAuth, RecaptchaVerifier, signInWithPhoneNumber } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-firestore.js";
+        import { getFirestore } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-firestore.js";
 
-        // Firebase configuration from your console
         const firebaseConfig = {
             apiKey: "AIzaSyCAqrAiYLLnFoa_JmU8A3jXPk0KoZukCVk",
             authDomain: "veyra-chatbox.firebaseapp.com",
@@ -126,12 +124,68 @@
             measurementId: "G-64PK736T85"
         };
 
-        // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        console.log("Firebase 13.3.0 Initialized successfully");
+        // UI Elements
+        const phoneInput = document.getElementById('phone-input');
+        const sendOtpBtn = document.getElementById('send-otp-btn');
+        const otpSection = document.getElementById('otp-section');
+        const otpInput = document.getElementById('otp-input');
+        const verifyOtpBtn = document.getElementById('verify-otp-btn');
+        const loginScreen = document.getElementById('login-screen');
+        const mainApp = document.getElementById('main-app');
+        const recaptchaContainer = document.getElementById('recaptcha-container');
+
+        // 1. Initialize invisible Recaptcha
+        window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+            'size': 'normal',
+            'callback': (response) => {
+                // reCAPTCHA solved, allow signInWithPhoneNumber.
+            }
+        });
+
+        // 2. Send the OTP
+        sendOtpBtn.addEventListener('click', () => {
+            const phoneNumber = "+91" + phoneInput.value.trim();
+            const appVerifier = window.recaptchaVerifier;
+
+            signInWithPhoneNumber(auth, phoneNumber, appVerifier)
+                .then((confirmationResult) => {
+                    window.confirmationResult = confirmationResult;
+                    
+                    // Hide Send button & Recaptcha, show OTP input
+                    sendOtpBtn.classList.add('hidden');
+                    recaptchaContainer.classList.add('hidden');
+                    otpSection.classList.remove('hidden');
+                    otpSection.classList.add('flex');
+                    
+                }).catch((error) => {
+                    console.error("SMS not sent", error);
+                    alert("Error sending OTP. Please try again.");
+                });
+        });
+
+        // 3. Verify the OTP
+        verifyOtpBtn.addEventListener('click', () => {
+            const code = otpInput.value.trim();
+            
+            window.confirmationResult.confirm(code).then((result) => {
+                const user = result.user;
+                console.log("User signed in:", user.uid);
+                
+                // Hide Login Screen, Show Chat UI
+                loginScreen.classList.add('hidden');
+                loginScreen.classList.remove('flex');
+                mainApp.classList.remove('hidden');
+                mainApp.classList.add('flex');
+                
+            }).catch((error) => {
+                console.error("Bad OTP", error);
+                alert("Invalid OTP code. Try again.");
+            });
+        });
     </script>
 </body>
 </html>
