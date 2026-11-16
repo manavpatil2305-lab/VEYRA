@@ -127,7 +127,7 @@
     <!-- Firebase SDK Connections & Google Auth Logic -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-app.js";
-        import { getAuth, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-auth.js";
+        import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-auth.js";
         import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -153,34 +153,47 @@
         const chatRoom = document.getElementById('chat-room');
         const backBtn = document.getElementById('back-btn');
 
-        // Handle Google Login
+        // 1. Listen for Auth State Changes (The Fix)
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // User is logged in, show main app
+                loginScreen.classList.add('hidden');
+                loginScreen.classList.remove('flex');
+                mainApp.classList.remove('hidden');
+                mainApp.classList.add('flex');
+            } else {
+                // User is not logged in, show login screen
+                loginScreen.classList.remove('hidden');
+                loginScreen.classList.add('flex');
+                mainApp.classList.add('hidden');
+                mainApp.classList.remove('flex');
+            }
+        });
+
+        // 2. Handle Google Login Button
         googleLoginBtn.addEventListener('click', () => {
             signInWithPopup(auth, provider)
                 .then(async (result) => {
                     const user = result.user;
-                    
-                    // Save user profile to Firestore database
-                    await setDoc(doc(db, "users", user.uid), {
-                        name: user.displayName,
-                        email: user.email,
-                        photoUrl: user.photoURL,
-                        isOnline: true,
-                        lastSeen: serverTimestamp()
-                    }, { merge: true });
-                    
-                    // Switch UI
-                    loginScreen.classList.add('hidden');
-                    loginScreen.classList.remove('flex');
-                    mainApp.classList.remove('hidden');
-                    mainApp.classList.add('flex');
-                    
+                    try {
+                        // Save user profile to Firestore
+                        await setDoc(doc(db, "users", user.uid), {
+                            name: user.displayName,
+                            email: user.email,
+                            photoUrl: user.photoURL,
+                            isOnline: true,
+                            lastSeen: serverTimestamp()
+                        }, { merge: true });
+                    } catch (error) {
+                        console.error("Firestore save error (check database rules):", error);
+                    }
                 }).catch((error) => {
                     console.error("Login failed", error);
-                    alert("Google Sign-In failed. Please try again.");
+                    alert("Google Sign-In failed: " + error.message);
                 });
         });
 
-        // Chat UI Navigation
+        // 3. Chat UI Navigation
         dummyChatBtn.addEventListener('click', () => {
             chatRoom.classList.remove('hidden');
             chatRoom.classList.add('flex');
