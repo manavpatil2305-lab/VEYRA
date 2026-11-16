@@ -153,15 +153,13 @@
         const searchInput = document.getElementById('search-users-input');
         const searchResults = document.getElementById('search-results');
         
-        // Instant Auth State Handler
+        // Instant Auth Handler with safe screen display
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 currentUser = user;
-                // Hide login screen instantly
                 loginScreen.classList.add('hidden');
                 loginScreen.classList.remove('flex');
 
-                // Check username in background
                 const userDoc = await getDoc(doc(db, "users", user.uid));
                 
                 if (userDoc.exists() && userDoc.data().username) {
@@ -172,7 +170,7 @@
                     
                     showScreen(mainApp);
                 } else {
-                    showScreen(usernameScreen);
+                    showScreen(usernameScreen); // Safely prompt for username creation
                 }
             } else {
                 showScreen(loginScreen);
