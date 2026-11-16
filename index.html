@@ -17,25 +17,22 @@
     <!-- LOGIN SCREEN -->
     <div id="login-screen" class="h-full flex flex-col items-center justify-center px-6 absolute top-0 left-0 w-full bg-[#0B141A] z-50">
         <h1 class="text-4xl font-bold text-white mb-8">veyra</h1>
-        <p class="text-gray-400 mb-6 text-center">Enter your phone number to get started</p>
+        <p class="text-gray-400 mb-8 text-center">Sign in securely to start messaging</p>
         
-        <div class="w-full max-w-sm bg-[#202C33] rounded-lg p-4 flex items-center gap-3 mb-6">
-            <span class="text-white border-r border-gray-600 pr-3">+91</span>
-            <input type="tel" id="phone-input" placeholder="Phone number" class="bg-transparent outline-none text-white w-full">
-        </div>
-        
-        <div id="recaptcha-container" class="mb-4"></div>
-        
-        <button id="send-otp-btn" class="w-full max-w-sm bg-[#25D366] text-[#0B141A] font-bold py-3 rounded-full shadow-lg">Send OTP</button>
-
-        <div id="otp-section" class="w-full max-w-sm hidden mt-6 flex-col items-center">
-            <input type="text" id="otp-input" placeholder="Enter 6-digit OTP" class="bg-[#202C33] outline-none text-white w-full rounded-lg p-4 mb-4 text-center tracking-widest">
-            <button id="verify-otp-btn" class="w-full bg-[#25D366] text-[#0B141A] font-bold py-3 rounded-full shadow-lg">Verify OTP</button>
-        </div>
+        <!-- Google Sign-In Button -->
+        <button id="google-login-btn" class="w-full max-w-sm bg-white text-black font-bold py-3 px-4 rounded-full shadow-lg flex items-center justify-center gap-3 hover:bg-gray-200 transition cursor-pointer">
+            <svg class="w-6 h-6" viewBox="0 0 24 24">
+                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+            </svg>
+            Continue with Google
+        </button>
     </div>
 
     <!-- MAIN APP UI (Chat List) -->
-    <div id="main-app" class="flex flex-col h-full w-full">
+    <div id="main-app" class="hidden flex-col h-full w-full">
         <header class="pt-4 pb-2 px-4 flex justify-between items-center bg-[#0B141A]">
             <h1 class="text-2xl font-bold text-white">veyra</h1>
             <div class="flex gap-6 text-xl items-center">
@@ -90,9 +87,8 @@
         </nav>
     </div>
 
-    <!-- INDIVIDUAL CHAT ROOM UI (Hidden by default) -->
+    <!-- INDIVIDUAL CHAT ROOM UI -->
     <div id="chat-room" class="hidden flex-col h-full w-full bg-[#0B141A] absolute top-0 left-0 z-40">
-        <!-- Chat Header -->
         <header class="pt-4 pb-2 px-4 flex items-center gap-4 bg-[#202C33] shadow-md z-10">
             <span id="back-btn" class="text-white text-2xl cursor-pointer">←</span>
             <div class="w-10 h-10 bg-gray-600 rounded-full flex-shrink-0"></div>
@@ -106,26 +102,19 @@
             </div>
         </header>
 
-        <!-- Messages Area -->
         <main class="flex-1 overflow-y-auto p-4 flex flex-col gap-2 relative bg-[#0B141A]" style="background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); background-size: cover;">
-            <!-- Dummy Received Message -->
             <div class="self-start max-w-[80%] bg-[#202C33] text-white rounded-lg p-2 rounded-tl-none shadow">
                 <p class="text-sm">Hey, the app is looking great!</p>
-                <div class="flex justify-end mt-1 text-[10px] text-gray-400">
-                    <span>10:45 AM</span>
-                </div>
+                <div class="flex justify-end mt-1 text-[10px] text-gray-400"><span>10:45 AM</span></div>
             </div>
-            <!-- Dummy Sent Message -->
             <div class="self-end max-w-[80%] bg-[#005C4B] text-white rounded-lg p-2 rounded-tr-none shadow">
                 <p class="text-sm">Thanks bro, adding real-time chat now.</p>
                 <div class="flex justify-end items-center gap-1 mt-1 text-[10px] text-gray-300">
-                    <span>10:46 AM</span>
-                    <span class="text-[#34B7F1]">✓✓</span>
+                    <span>10:46 AM</span><span class="text-[#34B7F1]">✓✓</span>
                 </div>
             </div>
         </main>
 
-        <!-- Input Bar -->
         <footer class="bg-[#202C33] p-2 flex items-center gap-2 pb-4">
             <span class="text-gray-400 text-2xl px-2 cursor-pointer">+</span>
             <input type="text" id="message-input" placeholder="Message" class="flex-1 bg-[#2A3942] text-white rounded-full px-4 py-2 outline-none text-sm">
@@ -135,10 +124,10 @@
         </footer>
     </div>
 
-    <!-- Firebase SDK Connections & Auth Logic -->
+    <!-- Firebase SDK Connections & Google Auth Logic -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-app.js";
-        import { getAuth, RecaptchaVerifier, signInWithPhoneNumber } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-auth.js";
+        import { getAuth, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-auth.js";
         import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -154,69 +143,44 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
+        const provider = new GoogleAuthProvider();
 
         // UI Elements
         const loginScreen = document.getElementById('login-screen');
-        const phoneInput = document.getElementById('phone-input');
-        const sendOtpBtn = document.getElementById('send-otp-btn');
-        const otpSection = document.getElementById('otp-section');
-        const otpInput = document.getElementById('otp-input');
-        const verifyOtpBtn = document.getElementById('verify-otp-btn');
-        const recaptchaContainer = document.getElementById('recaptcha-container');
-        
-        // Chat UI Elements
+        const mainApp = document.getElementById('main-app');
+        const googleLoginBtn = document.getElementById('google-login-btn');
         const dummyChatBtn = document.getElementById('dummy-chat-btn');
         const chatRoom = document.getElementById('chat-room');
         const backBtn = document.getElementById('back-btn');
 
-        // 1. Initialize invisible Recaptcha
-        window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
-            'size': 'normal',
-            'callback': (response) => {}
-        });
-
-        // 2. Send the OTP
-        sendOtpBtn.addEventListener('click', () => {
-            const phoneNumber = "+91" + phoneInput.value.trim();
-            const appVerifier = window.recaptchaVerifier;
-
-            signInWithPhoneNumber(auth, phoneNumber, appVerifier)
-                .then((confirmationResult) => {
-                    window.confirmationResult = confirmationResult;
-                    sendOtpBtn.classList.add('hidden');
-                    recaptchaContainer.classList.add('hidden');
-                    otpSection.classList.remove('hidden');
-                    otpSection.classList.add('flex');
+        // Handle Google Login
+        googleLoginBtn.addEventListener('click', () => {
+            signInWithPopup(auth, provider)
+                .then(async (result) => {
+                    const user = result.user;
+                    
+                    // Save user profile to Firestore database
+                    await setDoc(doc(db, "users", user.uid), {
+                        name: user.displayName,
+                        email: user.email,
+                        photoUrl: user.photoURL,
+                        isOnline: true,
+                        lastSeen: serverTimestamp()
+                    }, { merge: true });
+                    
+                    // Switch UI
+                    loginScreen.classList.add('hidden');
+                    loginScreen.classList.remove('flex');
+                    mainApp.classList.remove('hidden');
+                    mainApp.classList.add('flex');
+                    
                 }).catch((error) => {
-                    console.error("SMS not sent", error);
-                    alert("Error sending OTP. Please try again.");
+                    console.error("Login failed", error);
+                    alert("Google Sign-In failed. Please try again.");
                 });
         });
 
-        // 3. Verify OTP and Save User to Database
-        verifyOtpBtn.addEventListener('click', () => {
-            const code = otpInput.value.trim();
-            
-            window.confirmationResult.confirm(code).then(async (result) => {
-                const user = result.user;
-                
-                // SAVE USER PROFILE TO FIRESTORE
-                await setDoc(doc(db, "users", user.uid), {
-                    phoneNumber: user.phoneNumber,
-                    isOnline: true,
-                    lastSeen: serverTimestamp()
-                }, { merge: true });
-                
-                // Hide Login Screen (reveals Main App behind it)
-                loginScreen.classList.add('hidden');
-                
-            }).catch((error) => {
-                console.error("Bad OTP", error);
-                alert("Invalid OTP code. Try again.");
-            });
-        });
-
-        // 4. Open and Close the Chat Room
+        // Chat UI Navigation
         dummyChatBtn.addEventListener('click', () => {
             chatRoom.classList.remove('hidden');
             chatRoom.classList.add('flex');
