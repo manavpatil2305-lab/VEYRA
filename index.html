@@ -8,163 +8,100 @@
     <meta name="theme-color" content="#0B141A">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        ::-webkit-scrollbar { display: none; } /* Hides scrollbar for clean mobile look */
+        ::-webkit-scrollbar { display: none; }
         body { -webkit-tap-highlight-color: transparent; }
     </style>
 </head>
 <body class="bg-[#0B141A] text-[#E9EDEF] font-sans h-screen flex flex-col overflow-hidden">
 
-    <!-- Top Header -->
-    <header class="pt-4 pb-2 px-4 flex justify-between items-center bg-[#0B141A]">
-        <h1 class="text-2xl font-bold text-white">veyra</h1>
-        <div class="flex gap-6 text-xl items-center">
-            <span class="cursor-pointer">₹</span>
-            <span class="cursor-pointer">📷</span>
-            <span class="cursor-pointer">⋮</span>
+    <!-- LOGIN SCREEN (Hidden by default until we wire up Firebase) -->
+    <div id="login-screen" class="hidden h-full flex flex-col items-center justify-center px-6">
+        <h1 class="text-4xl font-bold text-white mb-8">veyra</h1>
+        <p class="text-gray-400 mb-6 text-center">Enter your phone number to get started</p>
+        <div class="w-full max-w-sm bg-[#202C33] rounded-lg p-4 flex items-center gap-3 mb-6">
+            <span class="text-white border-r border-gray-600 pr-3">+91</span>
+            <input type="tel" id="phone-input" placeholder="Phone number" class="bg-transparent outline-none text-white w-full">
         </div>
-    </header>
-
-    <!-- Search Bar -->
-    <div class="px-4 py-2">
-        <div class="bg-[#202C33] rounded-full flex items-center px-4 py-2 gap-3">
-            <span class="text-gray-400">🔍</span>
-            <input type="text" placeholder="Ask Meta AI or Search" class="bg-transparent outline-none text-sm w-full text-white placeholder-gray-400">
-        </div>
+        <button id="send-otp-btn" class="w-full max-w-sm bg-[#25D366] text-[#0B141A] font-bold py-3 rounded-full shadow-lg">Send OTP</button>
     </div>
 
-    <!-- Active Online Row (New Feature) -->
-    <div class="px-4 py-2 flex gap-4 overflow-x-auto border-b border-[#202C33] pb-4">
-        <!-- Online User 1 -->
-        <div class="flex flex-col items-center gap-1 flex-shrink-0 relative">
-            <div class="w-14 h-14 bg-gray-600 rounded-full border-2 border-[#0B141A] relative">
-                <div class="absolute bottom-0 right-0 w-4 h-4 bg-[#25D366] border-2 border-[#0B141A] rounded-full"></div>
+    <!-- MAIN APP UI -->
+    <div id="main-app" class="flex flex-col h-full w-full">
+        <!-- Top Header -->
+        <header class="pt-4 pb-2 px-4 flex justify-between items-center bg-[#0B141A]">
+            <h1 class="text-2xl font-bold text-white">veyra</h1>
+            <div class="flex gap-6 text-xl items-center">
+                <span class="cursor-pointer">📷</span>
+                <span class="cursor-pointer">⋮</span>
             </div>
-            <span class="text-xs text-gray-300">Rahul</span>
-        </div>
-        <!-- Online User 2 -->
-        <div class="flex flex-col items-center gap-1 flex-shrink-0 relative">
-            <div class="w-14 h-14 bg-gray-700 rounded-full border-2 border-[#0B141A] relative">
-                <div class="absolute bottom-0 right-0 w-4 h-4 bg-[#25D366] border-2 border-[#0B141A] rounded-full"></div>
+        </header>
+
+        <!-- Search Bar -->
+        <div class="px-4 py-2">
+            <div class="bg-[#202C33] rounded-full flex items-center px-4 py-2 gap-3">
+                <span class="text-gray-400">🔍</span>
+                <input type="text" placeholder="Search chats..." class="bg-transparent outline-none text-sm w-full text-white placeholder-gray-400">
             </div>
-            <span class="text-xs text-gray-300">Ankit</span>
         </div>
-        <!-- Online User 3 -->
-        <div class="flex flex-col items-center gap-1 flex-shrink-0 relative">
-            <div class="w-14 h-14 bg-gray-500 rounded-full border-2 border-[#0B141A] relative">
-                <div class="absolute bottom-0 right-0 w-4 h-4 bg-[#25D366] border-2 border-[#0B141A] rounded-full"></div>
+
+        <!-- Active Online Row -->
+        <div class="px-4 py-2 flex gap-4 overflow-x-auto border-b border-[#202C33] pb-4">
+            <div class="flex flex-col items-center gap-1 flex-shrink-0 relative">
+                <div class="w-14 h-14 bg-gray-600 rounded-full border-2 border-[#0B141A] relative">
+                    <div class="absolute bottom-0 right-0 w-4 h-4 bg-[#25D366] border-2 border-[#0B141A] rounded-full"></div>
+                </div>
+                <span class="text-xs text-gray-300">Rahul</span>
             </div>
-            <span class="text-xs text-gray-300">Sneha</span>
+            <div class="flex flex-col items-center gap-1 flex-shrink-0 relative">
+                <div class="w-14 h-14 bg-gray-700 rounded-full border-2 border-[#0B141A] relative">
+                    <div class="absolute bottom-0 right-0 w-4 h-4 bg-[#25D366] border-2 border-[#0B141A] rounded-full"></div>
+                </div>
+                <span class="text-xs text-gray-300">Ankit</span>
+            </div>
         </div>
+
+        <!-- Chat List Area -->
+        <main class="flex-1 overflow-y-auto relative pb-20">
+            <div class="flex items-center gap-4 px-4 py-3 hover:bg-[#202C33] cursor-pointer">
+                <div class="w-12 h-12 bg-gray-600 rounded-full flex-shrink-0"></div>
+                <div class="flex-1 flex flex-col justify-center">
+                    <div class="flex justify-between items-center">
+                        <h2 class="text-lg font-normal">Rahul Desai</h2>
+                        <span class="text-xs text-[#25D366]">4:13 pm</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <p class="text-sm text-gray-400 truncate w-4/5">Are we still on for the 5 PM meeting?</p>
+                        <div class="w-5 h-5 bg-[#25D366] rounded-full flex items-center justify-center text-[10px] text-[#0B141A] font-bold">1</div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Floating Action Button -->
+        <div class="absolute bottom-24 right-4 flex flex-col items-center gap-3">
+            <div class="w-14 h-14 bg-[#25D366] rounded-[16px] flex items-center justify-center shadow-lg cursor-pointer">
+                <span class="text-[#0B141A] text-2xl font-bold">+</span>
+            </div>
+        </div>
+
+        <!-- Cleaned Bottom Navigation -->
+        <nav class="bg-[#0B141A] border-t border-[#202C33] flex justify-around items-center px-2 py-2 pb-4 absolute bottom-0 w-full z-20">
+            <div class="flex flex-col items-center gap-1 cursor-pointer w-20">
+                <div class="relative px-4 py-1 bg-[#0A332C] rounded-full">
+                    <span class="text-white text-xl">💬</span>
+                </div>
+                <span class="text-xs text-white font-medium">Chats</span>
+            </div>
+            <div class="flex flex-col items-center gap-1 cursor-pointer opacity-60 w-20">
+                <span class="text-white text-xl">📞</span>
+                <span class="text-xs text-white">Calls</span>
+            </div>
+            <div class="flex flex-col items-center gap-1 cursor-pointer opacity-60 w-20">
+                <span class="text-white text-xl">⚙️</span>
+                <span class="text-xs text-white">Settings</span>
+            </div>
+        </nav>
     </div>
-
-    <!-- Filter Chips -->
-    <div class="px-4 py-3 flex gap-2 overflow-x-auto">
-        <span class="bg-[#0A332C] text-[#00A884] px-4 py-1.5 rounded-full text-sm font-medium flex-shrink-0 cursor-pointer">All</span>
-        <span class="bg-[#202C33] text-gray-300 px-4 py-1.5 rounded-full text-sm font-medium flex-shrink-0 cursor-pointer">Unread 20</span>
-        <span class="bg-[#202C33] text-gray-300 px-4 py-1.5 rounded-full text-sm font-medium flex-shrink-0 cursor-pointer">Favourites</span>
-        <span class="bg-[#202C33] text-gray-300 px-4 py-1.5 rounded-full text-sm font-medium flex-shrink-0 cursor-pointer">Groups 12</span>
-    </div>
-
-    <!-- Chat List Area -->
-    <main class="flex-1 overflow-y-auto relative pb-20">
-        
-        <!-- Chat Row 1 -->
-        <div class="flex items-center gap-4 px-4 py-3 hover:bg-[#202C33] cursor-pointer">
-            <div class="w-12 h-12 bg-gray-600 rounded-full flex-shrink-0"></div>
-            <div class="flex-1 flex flex-col justify-center">
-                <div class="flex justify-between items-center">
-                    <h2 class="text-lg font-normal">My Self (You)</h2>
-                    <span class="text-xs text-gray-400">4:13 pm</span>
-                </div>
-                <div class="flex justify-between items-center">
-                    <p class="text-sm text-gray-400 flex items-center gap-1">
-                        <span class="text-[#34B7F1]">✓✓</span> 📷 Photo
-                    </p>
-                    <span class="text-gray-400 text-sm">📌</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Chat Row 2 -->
-        <div class="flex items-center gap-4 px-4 py-3 hover:bg-[#202C33] cursor-pointer">
-            <div class="w-12 h-12 bg-gray-700 rounded-full flex-shrink-0"></div>
-            <div class="flex-1 flex flex-col justify-center">
-                <div class="flex justify-between items-center">
-                    <h2 class="text-lg font-normal">GCoEJ FY B.Tech 2026-27</h2>
-                    <span class="text-xs text-gray-400">02/11/26</span>
-                </div>
-                <div class="flex justify-between items-center">
-                    <p class="text-sm text-gray-400 truncate w-4/5">~ Uniquely Different: 🚫 This messag...</p>
-                    <span class="text-gray-400 text-sm">📌</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Chat Row 3 -->
-        <div class="flex items-center gap-4 px-4 py-3 hover:bg-[#202C33] cursor-pointer">
-            <div class="w-12 h-12 bg-gray-500 rounded-full flex-shrink-0"></div>
-            <div class="flex-1 flex flex-col justify-center">
-                <div class="flex justify-between items-center">
-                    <h2 class="text-lg font-normal">ताईसाहेब 👑❤️</h2>
-                    <span class="text-xs text-gray-400">1:37 pm</span>
-                </div>
-                <div class="flex justify-between items-center">
-                    <p class="text-sm text-gray-400 flex items-center gap-1">📷 Photo</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Chat Row 4 -->
-        <div class="flex items-center gap-4 px-4 py-3 hover:bg-[#202C33] cursor-pointer">
-            <div class="w-12 h-12 bg-gray-600 rounded-full flex-shrink-0"></div>
-            <div class="flex-1 flex flex-col justify-center">
-                <div class="flex justify-between items-center">
-                    <h2 class="text-lg font-normal">soap making workshop 2</h2>
-                    <span class="text-xs text-[#25D366]">4:23 pm</span>
-                </div>
-                <div class="flex justify-between items-center">
-                    <p class="text-sm text-gray-400 truncate w-4/5">Tai Business pinned a message</p>
-                    <div class="w-5 h-5 bg-[#25D366] rounded-full flex items-center justify-center text-[10px] text-[#0B141A] font-bold">3</div>
-                </div>
-            </div>
-        </div>
-
-    </main>
-
-    <!-- Floating Action Button -->
-    <div class="absolute bottom-24 right-4 flex flex-col items-center gap-3">
-        <!-- Small AI Button -->
-        <div class="w-10 h-10 bg-[#202C33] rounded-2xl flex items-center justify-center shadow-lg cursor-pointer">
-            <span class="text-[#A855F7] text-xl">✨</span>
-        </div>
-        <!-- Main New Message Button -->
-        <div class="w-14 h-14 bg-[#25D366] rounded-[16px] flex items-center justify-center shadow-lg cursor-pointer">
-            <span class="text-[#0B141A] text-2xl font-bold">+</span>
-        </div>
-    </div>
-
-    <!-- Bottom Navigation -->
-    <nav class="bg-[#0B141A] border-t border-[#202C33] flex justify-between items-center px-6 py-2 pb-4 absolute bottom-0 w-full z-20">
-        <div class="flex flex-col items-center gap-1 cursor-pointer">
-            <div class="relative px-4 py-1 bg-[#0A332C] rounded-full">
-                <span class="text-white text-xl">💬</span>
-                <span class="absolute -top-1 right-0 bg-[#25D366] text-[#0B141A] text-[10px] font-bold px-1.5 py-0.5 rounded-full">20</span>
-            </div>
-            <span class="text-xs text-white font-medium">Chats</span>
-        </div>
-        <div class="flex flex-col items-center gap-1 cursor-pointer opacity-60">
-            <span class="text-white text-xl">🔄</span>
-            <span class="text-xs text-white">Updates</span>
-        </div>
-        <div class="flex flex-col items-center gap-1 cursor-pointer opacity-60">
-            <span class="text-white text-xl">👥</span>
-            <span class="text-xs text-white">Communities</span>
-        </div>
-        <div class="flex flex-col items-center gap-1 cursor-pointer opacity-60">
-            <span class="text-white text-xl">📞</span>
-            <span class="text-xs text-white">Calls</span>
-        </div>
-    </nav>
 
 </body>
 </html>
