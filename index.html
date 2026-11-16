@@ -18,8 +18,7 @@
     <div id="login-screen" class="h-full flex flex-col items-center justify-center px-6 absolute top-0 left-0 w-full bg-[#0B141A] z-50">
         <h1 class="text-4xl font-bold text-white mb-8">veyra</h1>
         <p class="text-gray-400 mb-8 text-center">Sign in securely to start messaging</p>
-        
-        <button id="google-login-btn" class="w-full max-w-sm bg-white text-black font-bold py-3 px-4 rounded-full shadow-lg flex items-center justify-center gap-3 hover:bg-gray-200 transition cursor-pointer">
+        <button id="google-login-btn" class="w-full max-w-sm bg-white text-black font-bold py-3 px-4 rounded-full shadow-lg flex items-center justify-center gap-3">
             <svg class="w-6 h-6" viewBox="0 0 24 24">
                 <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
                 <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
@@ -30,7 +29,18 @@
         </button>
     </div>
 
-    <!-- MAIN APP UI (Chat List) -->
+    <!-- CHOOSE USERNAME SCREEN (Shows only for new users) -->
+    <div id="username-screen" class="hidden h-full flex flex-col items-center justify-center px-6 absolute top-0 left-0 w-full bg-[#0B141A] z-50">
+        <h2 class="text-2xl font-bold text-white mb-2">Create your Veyra ID</h2>
+        <p class="text-gray-400 mb-8 text-center text-sm">This is how friends will find you. No emails shared.</p>
+        <div class="w-full max-w-sm bg-[#202C33] rounded-lg p-4 flex items-center gap-3 mb-6">
+            <span class="text-gray-500 font-bold">@</span>
+            <input type="text" id="username-input" placeholder="manav_23" class="bg-transparent outline-none text-white w-full lowercase">
+        </div>
+        <button id="save-username-btn" class="w-full max-w-sm bg-[#25D366] text-[#0B141A] font-bold py-3 rounded-full">Complete Profile</button>
+    </div>
+
+    <!-- MAIN APP UI -->
     <div id="main-app" class="hidden flex-col h-full w-full">
         <header class="pt-4 pb-2 px-4 flex justify-between items-center bg-[#0B141A]">
             <h1 class="text-2xl font-bold text-white">veyra</h1>
@@ -40,75 +50,82 @@
             </div>
         </header>
 
-        <div class="px-4 py-2">
+        <!-- Search Bar -->
+        <div class="px-4 py-2 relative">
             <div class="bg-[#202C33] rounded-full flex items-center px-4 py-2 gap-3">
                 <span class="text-gray-400">🔍</span>
-                <input type="text" placeholder="Search chats..." class="bg-transparent outline-none text-sm w-full text-white placeholder-gray-400">
+                <input type="text" id="search-users-input" placeholder="Search username to chat..." class="bg-transparent outline-none text-sm w-full text-white">
             </div>
+            <!-- Search Results Dropdown -->
+            <div id="search-results" class="hidden absolute top-14 left-4 right-4 bg-[#202C33] rounded-xl shadow-xl z-30 p-2 flex-col gap-1 max-h-60 overflow-y-auto"></div>
         </div>
 
-        <main class="flex-1 overflow-y-auto relative pb-20">
-            <div id="dummy-chat-btn" class="flex items-center gap-4 px-4 py-3 hover:bg-[#202C33] cursor-pointer">
-                <div class="w-12 h-12 bg-gray-600 rounded-full flex-shrink-0 text-2xl flex items-center justify-center">🌍</div>
-                <div class="flex-1 flex flex-col justify-center">
-                    <div class="flex justify-between items-center">
-                        <h2 class="text-lg font-normal">Global Chat Room</h2>
-                        <span class="text-xs text-[#25D366]">Live</span>
-                    </div>
-                    <div class="flex justify-between items-center">
-                        <p class="text-sm text-gray-400">Tap to join the real-time chat</p>
-                    </div>
-                </div>
-            </div>
+        <main class="flex-1 overflow-y-auto relative pb-20" id="recent-chats-list">
+            <div class="p-4 text-center text-gray-500 text-sm mt-10">Search a username above to start a private chat!</div>
         </main>
 
         <nav class="bg-[#0B141A] border-t border-[#202C33] flex justify-around items-center px-2 py-2 pb-4 absolute bottom-0 w-full z-20">
-            <div class="flex flex-col items-center gap-1 cursor-pointer w-20">
+            <div id="nav-chats" class="flex flex-col items-center gap-1 cursor-pointer w-20">
                 <div class="relative px-4 py-1 bg-[#0A332C] rounded-full"><span class="text-white text-xl">💬</span></div>
                 <span class="text-xs text-white font-medium">Chats</span>
             </div>
-            <div class="flex flex-col items-center gap-1 cursor-pointer opacity-60 w-20">
-                <span class="text-white text-xl">📞</span>
-                <span class="text-xs text-white">Calls</span>
-            </div>
-            <div class="flex flex-col items-center gap-1 cursor-pointer opacity-60 w-20">
-                <span class="text-white text-xl">⚙️</span>
+            <div id="nav-settings" class="flex flex-col items-center gap-1 cursor-pointer opacity-60 w-20">
+                <div class="relative px-4 py-1 rounded-full"><span class="text-white text-xl">⚙️</span></div>
                 <span class="text-xs text-white">Settings</span>
             </div>
         </nav>
     </div>
 
-    <!-- INDIVIDUAL CHAT ROOM UI -->
-    <div id="chat-room" class="hidden flex-col h-full w-full bg-[#0B141A] absolute top-0 left-0 z-40">
+    <!-- SETTINGS SCREEN -->
+    <div id="settings-screen" class="hidden flex-col h-full w-full bg-[#0B141A] absolute top-0 left-0 z-10 pb-20">
+        <header class="pt-6 pb-4 px-4 border-b border-[#202C33]"><h1 class="text-2xl font-bold text-white">Settings</h1></header>
+        <div class="p-4 flex items-center gap-4 border-b border-[#202C33]">
+            <div id="settings-profile-pic" class="w-16 h-16 bg-gray-600 rounded-full bg-cover bg-center"></div>
+            <div>
+                <h2 id="settings-name" class="text-xl font-normal text-white">User</h2>
+                <p id="settings-username" class="text-sm text-[#25D366]">@username</p>
+            </div>
+        </div>
+        <div class="p-4 mt-2">
+            <h3 class="text-[#25D366] text-sm font-semibold mb-4">PRIVACY</h3>
+            <div class="bg-[#111B21] rounded-xl p-4 shadow-sm">
+                <h4 class="text-white text-lg">Default Message Timer</h4>
+                <select id="disappearing-timer" class="w-full mt-2 bg-[#202C33] text-white p-3 rounded-lg outline-none cursor-pointer">
+                    <option value="off">Off</option>
+                    <option value="view-once">View Once</option>
+                    <option value="7-hours">7 Hours</option>
+                    <option value="24-hours">24 Hours</option>
+                </select>
+            </div>
+        </div>
+        <div class="p-4"><button id="logout-btn" class="w-full bg-red-600/20 text-red-500 font-bold py-3 rounded-xl">Log Out</button></div>
+    </div>
+
+    <!-- PRIVATE CHAT ROOM UI -->
+    <div id="chat-room" class="hidden flex-col h-full w-full bg-[#0B141A] absolute top-0 left-0 z-50">
         <header class="pt-4 pb-2 px-4 flex items-center gap-4 bg-[#202C33] shadow-md z-10">
             <span id="back-btn" class="text-white text-2xl cursor-pointer">←</span>
-            <div class="w-10 h-10 bg-gray-600 rounded-full flex-shrink-0 text-xl flex items-center justify-center">🌍</div>
+            <div class="w-10 h-10 bg-gray-600 rounded-full flex-shrink-0" id="chat-header-pic" style="background-size: cover;"></div>
             <div class="flex-1">
-                <h2 class="text-lg font-medium text-white">Global Chat Room</h2>
-                <span class="text-xs text-[#25D366]">Online</span>
+                <h2 class="text-lg font-medium text-white" id="chat-header-name">Name</h2>
+                <span class="text-xs text-[#25D366]" id="chat-header-username">@username</span>
             </div>
+            <div class="flex gap-4 text-xl items-center"><span class="cursor-pointer text-white">📞</span></div>
         </header>
-
-        <!-- Messages Area (ID Added) -->
-        <main id="messages-area" class="flex-1 overflow-y-auto p-4 flex flex-col gap-3 relative bg-[#0B141A]" style="background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); background-size: cover;">
-            <!-- Messages will spawn here dynamically via JavaScript -->
-        </main>
-
+        <main id="messages-area" class="flex-1 overflow-y-auto p-4 flex flex-col gap-3 relative bg-[#0B141A]" style="background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); background-size: cover;"></main>
         <footer class="bg-[#202C33] p-2 flex items-center gap-2 pb-4">
             <span class="text-gray-400 text-2xl px-2 cursor-pointer">+</span>
             <input type="text" id="message-input" placeholder="Message" class="flex-1 bg-[#2A3942] text-white rounded-full px-4 py-2 outline-none text-sm">
-            <!-- Send Button (ID Added) -->
             <div id="send-btn" class="w-10 h-10 bg-[#25D366] rounded-full flex items-center justify-center cursor-pointer flex-shrink-0">
                 <span class="text-[#0B141A] font-bold">➤</span>
             </div>
         </footer>
     </div>
 
-    <!-- Firebase SDK Connections & App Logic -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-app.js";
-        import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-auth.js";
-        import { getFirestore, doc, setDoc, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-firestore.js";
+        import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc, collection, addDoc, query, where, getDocs, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCAqrAiYLLnFoa_JmU8A3jXPk0KoZukCVk",
@@ -125,121 +142,185 @@
         const provider = new GoogleAuthProvider();
 
         let currentUser = null;
+        let currentUserData = null;
+        let activeChatId = null; 
+        let currentChatListener = null;
 
-        // UI Elements
+        // UI Variables
         const loginScreen = document.getElementById('login-screen');
+        const usernameScreen = document.getElementById('username-screen');
         const mainApp = document.getElementById('main-app');
-        const googleLoginBtn = document.getElementById('google-login-btn');
-        
-        const dummyChatBtn = document.getElementById('dummy-chat-btn');
         const chatRoom = document.getElementById('chat-room');
-        const backBtn = document.getElementById('back-btn');
+        const searchInput = document.getElementById('search-users-input');
+        const searchResults = document.getElementById('search-results');
         
-        const messageInput = document.getElementById('message-input');
-        const sendBtn = document.getElementById('send-btn');
-        const messagesArea = document.getElementById('messages-area');
-
-        // 1. Check Auth & Load Messages
-        onAuthStateChanged(auth, (user) => {
+        // 1. Auth Flow & Username Check
+        onAuthStateChanged(auth, async (user) => {
             if (user) {
                 currentUser = user;
-                loginScreen.classList.add('hidden');
-                loginScreen.classList.remove('flex');
-                mainApp.classList.remove('hidden');
-                mainApp.classList.add('flex');
+                const userDoc = await getDoc(doc(db, "users", user.uid));
                 
-                // Start listening to the database in real-time
-                loadRealTimeMessages();
+                if (userDoc.exists() && userDoc.data().username) {
+                    // User already has a username, load app
+                    currentUserData = userDoc.data();
+                    document.getElementById('settings-name').textContent = currentUserData.name;
+                    document.getElementById('settings-username').textContent = "@" + currentUserData.username;
+                    if(currentUserData.photoUrl) document.getElementById('settings-profile-pic').style.backgroundImage = `url('${currentUserData.photoUrl}')`;
+                    
+                    showScreen(mainApp);
+                } else {
+                    // New User - Must pick a username
+                    showScreen(usernameScreen);
+                }
             } else {
-                loginScreen.classList.remove('hidden');
-                loginScreen.classList.add('flex');
-                mainApp.classList.add('hidden');
-                mainApp.classList.remove('flex');
+                showScreen(loginScreen);
             }
         });
 
-        // 2. Google Login
-        googleLoginBtn.addEventListener('click', () => {
-            signInWithPopup(auth, provider).then(async (result) => {
-                const user = result.user;
-                await setDoc(doc(db, "users", user.uid), {
-                    name: user.displayName,
-                    email: user.email,
-                    isOnline: true,
-                    lastSeen: serverTimestamp()
-                }, { merge: true });
+        document.getElementById('google-login-btn').addEventListener('click', () => {
+            signInWithPopup(auth, provider);
+        });
+
+        document.getElementById('save-username-btn').addEventListener('click', async () => {
+            const rawUsername = document.getElementById('username-input').value.trim().toLowerCase();
+            if(rawUsername.length < 3) return alert("Username must be at least 3 characters");
+
+            // Save new user profile to Firestore
+            await setDoc(doc(db, "users", currentUser.uid), {
+                uid: currentUser.uid,
+                name: currentUser.displayName,
+                email: currentUser.email,
+                photoUrl: currentUser.photoURL,
+                username: rawUsername,
+                joinedAt: serverTimestamp()
+            });
+            window.location.reload(); // Reload to apply data
+        });
+
+        document.getElementById('logout-btn').addEventListener('click', () => signOut(auth));
+
+        // 2. Search Users Logic (Insta/Snap Style)
+        searchInput.addEventListener('input', async (e) => {
+            const val = e.target.value.trim().toLowerCase();
+            if(val.length < 2) { searchResults.classList.add('hidden'); return; }
+
+            const q = query(collection(db, "users"), where("username", ">=", val), where("username", "<=", val + '\uf8ff'));
+            const querySnapshot = await getDocs(q);
+            
+            searchResults.innerHTML = "";
+            let found = false;
+
+            querySnapshot.forEach((docSnap) => {
+                const userObj = docSnap.data();
+                if(userObj.uid === currentUser.uid) return; // Don't show yourself
+                found = true;
+                
+                const div = document.createElement('div');
+                div.className = "flex items-center gap-3 p-2 hover:bg-[#2A3942] rounded-lg cursor-pointer";
+                div.innerHTML = `
+                    <div class="w-10 h-10 bg-gray-600 rounded-full" style="background-image: url('${userObj.photoUrl}'); background-size: cover;"></div>
+                    <div>
+                        <h4 class="text-white text-sm">${userObj.name}</h4>
+                        <p class="text-xs text-[#25D366]">@${userObj.username}</p>
+                    </div>
+                `;
+                // Click a user to start private chat
+                div.addEventListener('click', () => openPrivateChat(userObj));
+                searchResults.appendChild(div);
+            });
+
+            if(!found) searchResults.innerHTML = `<div class="p-2 text-gray-400 text-sm">No users found</div>`;
+            searchResults.classList.remove('hidden');
+        });
+
+        // Hide search when clicking outside
+        document.addEventListener('click', (e) => {
+            if(e.target !== searchInput) searchResults.classList.add('hidden');
+        });
+
+        // 3. Private 1-on-1 Chat Logic
+        function openPrivateChat(otherUser) {
+            searchInput.value = "";
+            searchResults.classList.add('hidden');
+            
+            // Create a unique Chat ID based on both UIDs
+            const uids = [currentUser.uid, otherUser.uid].sort();
+            activeChatId = `${uids[0]}_${uids[1]}`;
+
+            // Update Header
+            document.getElementById('chat-header-name').textContent = otherUser.name;
+            document.getElementById('chat-header-username').textContent = "@" + otherUser.username;
+            if(otherUser.photoUrl) document.getElementById('chat-header-pic').style.backgroundImage = `url('${otherUser.photoUrl}')`;
+
+            showScreen(chatRoom);
+            loadPrivateMessages();
+        }
+
+        document.getElementById('back-btn').addEventListener('click', () => {
+            if(currentChatListener) currentChatListener(); // Stop listening to old chat
+            activeChatId = null;
+            showScreen(mainApp);
+        });
+
+        document.getElementById('send-btn').addEventListener('click', async () => {
+            const text = document.getElementById('message-input').value.trim();
+            const timer = document.getElementById('disappearing-timer').value;
+            if (!text || !activeChatId) return;
+
+            document.getElementById('message-input').value = "";
+            await addDoc(collection(db, `chats/${activeChatId}/messages`), {
+                text: text,
+                senderUid: currentUser.uid,
+                timer: timer,
+                timestamp: serverTimestamp()
             });
         });
 
-        // 3. UI Navigation
-        dummyChatBtn.addEventListener('click', () => {
-            chatRoom.classList.remove('hidden');
-            chatRoom.classList.add('flex');
-            messagesArea.scrollTop = messagesArea.scrollHeight; // Scroll to bottom on open
-        });
-        backBtn.addEventListener('click', () => {
-            chatRoom.classList.add('hidden');
-            chatRoom.classList.remove('flex');
+        document.getElementById('message-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') document.getElementById('send-btn').click();
         });
 
-        // 4. Send Message Function
-        sendBtn.addEventListener('click', async () => {
-            const text = messageInput.value.trim();
-            if (!text || !currentUser) return;
-
-            messageInput.value = ""; // Clear input bar immediately
-
-            try {
-                // Push to Firebase
-                await addDoc(collection(db, "global_chat"), {
-                    text: text,
-                    uid: currentUser.uid,
-                    senderName: currentUser.displayName,
-                    timestamp: serverTimestamp()
-                });
-            } catch (error) {
-                console.error("Error sending message: ", error);
-                alert("Failed to send message. Check Firestore rules.");
-            }
-        });
-
-        // Allow sending with Enter key
-        messageInput.addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') sendBtn.click();
-        });
-
-        // 5. Receive Real-Time Messages Function
-        function loadRealTimeMessages() {
-            const q = query(collection(db, "global_chat"), orderBy("timestamp", "asc"));
+        function loadPrivateMessages() {
+            const messagesArea = document.getElementById('messages-area');
+            const q = query(collection(db, `chats/${activeChatId}/messages`), orderBy("timestamp", "asc"));
             
-            // onSnapshot actively watches the database and updates instantly
-            onSnapshot(q, (snapshot) => {
-                messagesArea.innerHTML = ""; // Clear old messages
-                
+            if(currentChatListener) currentChatListener(); // clear previous listener
+
+            currentChatListener = onSnapshot(q, (snapshot) => {
+                messagesArea.innerHTML = ""; 
                 snapshot.forEach((doc) => {
                     const msg = doc.data();
-                    const isMe = msg.uid === currentUser.uid;
+                    const isMe = msg.senderUid === currentUser.uid;
+                    const timerIcon = msg.timer && msg.timer !== "off" ? "⏱️" : "";
 
-                    // Create the chat bubble dynamically
                     const div = document.createElement('div');
                     div.className = isMe 
                         ? "self-end max-w-[80%] bg-[#005C4B] text-white rounded-lg p-2 rounded-tr-none shadow" 
                         : "self-start max-w-[80%] bg-[#202C33] text-white rounded-lg p-2 rounded-tl-none shadow";
-                    
                     div.innerHTML = `
-                        ${!isMe ? `<span class="text-xs text-[#34B7F1] font-bold">${msg.senderName}</span>` : ''}
                         <p class="text-sm">${msg.text}</p>
-                        <div class="flex justify-end mt-1 text-[10px] ${isMe ? 'text-gray-300' : 'text-gray-400'}">
-                            <span>${isMe ? '✓✓' : ''}</span>
+                        <div class="flex justify-end mt-1 text-[10px] ${isMe ? 'text-gray-300' : 'text-gray-400'} items-center gap-1">
+                            <span>${timerIcon}</span><span>${isMe ? '✓✓' : ''}</span>
                         </div>
                     `;
                     messagesArea.appendChild(div);
                 });
-                
-                // Auto-scroll to the newest message
                 messagesArea.scrollTop = messagesArea.scrollHeight;
             });
         }
+
+        // Navigation Helper
+        function showScreen(screenEl) {
+            [loginScreen, usernameScreen, mainApp, document.getElementById('settings-screen'), chatRoom].forEach(el => {
+                if(el) { el.classList.add('hidden'); el.classList.remove('flex'); }
+            });
+            screenEl.classList.remove('hidden');
+            screenEl.classList.add('flex');
+        }
+
+        document.getElementById('nav-settings').addEventListener('click', () => showScreen(document.getElementById('settings-screen')));
+        document.getElementById('nav-chats').addEventListener('click', () => showScreen(mainApp));
+
     </script>
 </body>
 </html>
