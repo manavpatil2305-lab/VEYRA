@@ -19,7 +19,6 @@
         <h1 class="text-4xl font-bold text-white mb-8">veyra</h1>
         <p class="text-gray-400 mb-8 text-center">Sign in securely to start messaging</p>
         
-        <!-- Google Sign-In Button -->
         <button id="google-login-btn" class="w-full max-w-sm bg-white text-black font-bold py-3 px-4 rounded-full shadow-lg flex items-center justify-center gap-3 hover:bg-gray-200 transition cursor-pointer">
             <svg class="w-6 h-6" viewBox="0 0 24 24">
                 <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
@@ -49,27 +48,19 @@
         </div>
 
         <main class="flex-1 overflow-y-auto relative pb-20">
-            <!-- Clickable Chat Row -->
             <div id="dummy-chat-btn" class="flex items-center gap-4 px-4 py-3 hover:bg-[#202C33] cursor-pointer">
-                <div class="w-12 h-12 bg-gray-600 rounded-full flex-shrink-0"></div>
+                <div class="w-12 h-12 bg-gray-600 rounded-full flex-shrink-0 text-2xl flex items-center justify-center">🌍</div>
                 <div class="flex-1 flex flex-col justify-center">
                     <div class="flex justify-between items-center">
-                        <h2 class="text-lg font-normal">Rahul Desai</h2>
-                        <span class="text-xs text-[#25D366]">4:13 pm</span>
+                        <h2 class="text-lg font-normal">Global Chat Room</h2>
+                        <span class="text-xs text-[#25D366]">Live</span>
                     </div>
                     <div class="flex justify-between items-center">
-                        <p class="text-sm text-gray-400 truncate w-4/5">Are we still on for the 5 PM meeting?</p>
-                        <div class="w-5 h-5 bg-[#25D366] rounded-full flex items-center justify-center text-[10px] text-[#0B141A] font-bold">1</div>
+                        <p class="text-sm text-gray-400">Tap to join the real-time chat</p>
                     </div>
                 </div>
             </div>
         </main>
-
-        <div class="absolute bottom-24 right-4 flex flex-col items-center gap-3">
-            <div class="w-14 h-14 bg-[#25D366] rounded-[16px] flex items-center justify-center shadow-lg cursor-pointer">
-                <span class="text-[#0B141A] text-2xl font-bold">+</span>
-            </div>
-        </div>
 
         <nav class="bg-[#0B141A] border-t border-[#202C33] flex justify-around items-center px-2 py-2 pb-4 absolute bottom-0 w-full z-20">
             <div class="flex flex-col items-center gap-1 cursor-pointer w-20">
@@ -91,44 +82,33 @@
     <div id="chat-room" class="hidden flex-col h-full w-full bg-[#0B141A] absolute top-0 left-0 z-40">
         <header class="pt-4 pb-2 px-4 flex items-center gap-4 bg-[#202C33] shadow-md z-10">
             <span id="back-btn" class="text-white text-2xl cursor-pointer">←</span>
-            <div class="w-10 h-10 bg-gray-600 rounded-full flex-shrink-0"></div>
+            <div class="w-10 h-10 bg-gray-600 rounded-full flex-shrink-0 text-xl flex items-center justify-center">🌍</div>
             <div class="flex-1">
-                <h2 class="text-lg font-medium text-white">Rahul Desai</h2>
-                <span class="text-xs text-gray-400">Online</span>
-            </div>
-            <div class="flex gap-4 text-xl items-center">
-                <span class="cursor-pointer text-white">📞</span>
-                <span class="cursor-pointer text-white">⋮</span>
+                <h2 class="text-lg font-medium text-white">Global Chat Room</h2>
+                <span class="text-xs text-[#25D366]">Online</span>
             </div>
         </header>
 
-        <main class="flex-1 overflow-y-auto p-4 flex flex-col gap-2 relative bg-[#0B141A]" style="background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); background-size: cover;">
-            <div class="self-start max-w-[80%] bg-[#202C33] text-white rounded-lg p-2 rounded-tl-none shadow">
-                <p class="text-sm">Hey, the app is looking great!</p>
-                <div class="flex justify-end mt-1 text-[10px] text-gray-400"><span>10:45 AM</span></div>
-            </div>
-            <div class="self-end max-w-[80%] bg-[#005C4B] text-white rounded-lg p-2 rounded-tr-none shadow">
-                <p class="text-sm">Thanks bro, adding real-time chat now.</p>
-                <div class="flex justify-end items-center gap-1 mt-1 text-[10px] text-gray-300">
-                    <span>10:46 AM</span><span class="text-[#34B7F1]">✓✓</span>
-                </div>
-            </div>
+        <!-- Messages Area (ID Added) -->
+        <main id="messages-area" class="flex-1 overflow-y-auto p-4 flex flex-col gap-3 relative bg-[#0B141A]" style="background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); background-size: cover;">
+            <!-- Messages will spawn here dynamically via JavaScript -->
         </main>
 
         <footer class="bg-[#202C33] p-2 flex items-center gap-2 pb-4">
             <span class="text-gray-400 text-2xl px-2 cursor-pointer">+</span>
             <input type="text" id="message-input" placeholder="Message" class="flex-1 bg-[#2A3942] text-white rounded-full px-4 py-2 outline-none text-sm">
-            <div class="w-10 h-10 bg-[#25D366] rounded-full flex items-center justify-center cursor-pointer flex-shrink-0">
+            <!-- Send Button (ID Added) -->
+            <div id="send-btn" class="w-10 h-10 bg-[#25D366] rounded-full flex items-center justify-center cursor-pointer flex-shrink-0">
                 <span class="text-[#0B141A] font-bold">➤</span>
             </div>
         </footer>
     </div>
 
-    <!-- Firebase SDK Connections & Google Auth Logic -->
+    <!-- Firebase SDK Connections & App Logic -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-app.js";
         import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-auth.js";
-        import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCAqrAiYLLnFoa_JmU8A3jXPk0KoZukCVk",
@@ -136,8 +116,7 @@
             projectId: "veyra-chatbox",
             storageBucket: "veyra-chatbox.firebasestorage.app",
             messagingSenderId: "443166587498",
-            appId: "1:443166587498:web:75577c5660eae841566813",
-            measurementId: "G-64PK736T85"
+            appId: "1:443166587498:web:75577c5660eae841566813"
         };
 
         const app = initializeApp(firebaseConfig);
@@ -145,24 +124,33 @@
         const db = getFirestore(app);
         const provider = new GoogleAuthProvider();
 
+        let currentUser = null;
+
         // UI Elements
         const loginScreen = document.getElementById('login-screen');
         const mainApp = document.getElementById('main-app');
         const googleLoginBtn = document.getElementById('google-login-btn');
+        
         const dummyChatBtn = document.getElementById('dummy-chat-btn');
         const chatRoom = document.getElementById('chat-room');
         const backBtn = document.getElementById('back-btn');
+        
+        const messageInput = document.getElementById('message-input');
+        const sendBtn = document.getElementById('send-btn');
+        const messagesArea = document.getElementById('messages-area');
 
-        // 1. Listen for Auth State Changes (The Fix)
+        // 1. Check Auth & Load Messages
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                // User is logged in, show main app
+                currentUser = user;
                 loginScreen.classList.add('hidden');
                 loginScreen.classList.remove('flex');
                 mainApp.classList.remove('hidden');
                 mainApp.classList.add('flex');
+                
+                // Start listening to the database in real-time
+                loadRealTimeMessages();
             } else {
-                // User is not logged in, show login screen
                 loginScreen.classList.remove('hidden');
                 loginScreen.classList.add('flex');
                 mainApp.classList.add('hidden');
@@ -170,39 +158,88 @@
             }
         });
 
-        // 2. Handle Google Login Button
+        // 2. Google Login
         googleLoginBtn.addEventListener('click', () => {
-            signInWithPopup(auth, provider)
-                .then(async (result) => {
-                    const user = result.user;
-                    try {
-                        // Save user profile to Firestore
-                        await setDoc(doc(db, "users", user.uid), {
-                            name: user.displayName,
-                            email: user.email,
-                            photoUrl: user.photoURL,
-                            isOnline: true,
-                            lastSeen: serverTimestamp()
-                        }, { merge: true });
-                    } catch (error) {
-                        console.error("Firestore save error (check database rules):", error);
-                    }
-                }).catch((error) => {
-                    console.error("Login failed", error);
-                    alert("Google Sign-In failed: " + error.message);
-                });
+            signInWithPopup(auth, provider).then(async (result) => {
+                const user = result.user;
+                await setDoc(doc(db, "users", user.uid), {
+                    name: user.displayName,
+                    email: user.email,
+                    isOnline: true,
+                    lastSeen: serverTimestamp()
+                }, { merge: true });
+            });
         });
 
-        // 3. Chat UI Navigation
+        // 3. UI Navigation
         dummyChatBtn.addEventListener('click', () => {
             chatRoom.classList.remove('hidden');
             chatRoom.classList.add('flex');
+            messagesArea.scrollTop = messagesArea.scrollHeight; // Scroll to bottom on open
         });
-
         backBtn.addEventListener('click', () => {
             chatRoom.classList.add('hidden');
             chatRoom.classList.remove('flex');
         });
+
+        // 4. Send Message Function
+        sendBtn.addEventListener('click', async () => {
+            const text = messageInput.value.trim();
+            if (!text || !currentUser) return;
+
+            messageInput.value = ""; // Clear input bar immediately
+
+            try {
+                // Push to Firebase
+                await addDoc(collection(db, "global_chat"), {
+                    text: text,
+                    uid: currentUser.uid,
+                    senderName: currentUser.displayName,
+                    timestamp: serverTimestamp()
+                });
+            } catch (error) {
+                console.error("Error sending message: ", error);
+                alert("Failed to send message. Check Firestore rules.");
+            }
+        });
+
+        // Allow sending with Enter key
+        messageInput.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') sendBtn.click();
+        });
+
+        // 5. Receive Real-Time Messages Function
+        function loadRealTimeMessages() {
+            const q = query(collection(db, "global_chat"), orderBy("timestamp", "asc"));
+            
+            // onSnapshot actively watches the database and updates instantly
+            onSnapshot(q, (snapshot) => {
+                messagesArea.innerHTML = ""; // Clear old messages
+                
+                snapshot.forEach((doc) => {
+                    const msg = doc.data();
+                    const isMe = msg.uid === currentUser.uid;
+
+                    // Create the chat bubble dynamically
+                    const div = document.createElement('div');
+                    div.className = isMe 
+                        ? "self-end max-w-[80%] bg-[#005C4B] text-white rounded-lg p-2 rounded-tr-none shadow" 
+                        : "self-start max-w-[80%] bg-[#202C33] text-white rounded-lg p-2 rounded-tl-none shadow";
+                    
+                    div.innerHTML = `
+                        ${!isMe ? `<span class="text-xs text-[#34B7F1] font-bold">${msg.senderName}</span>` : ''}
+                        <p class="text-sm">${msg.text}</p>
+                        <div class="flex justify-end mt-1 text-[10px] ${isMe ? 'text-gray-300' : 'text-gray-400'}">
+                            <span>${isMe ? '✓✓' : ''}</span>
+                        </div>
+                    `;
+                    messagesArea.appendChild(div);
+                });
+                
+                // Auto-scroll to the newest message
+                messagesArea.scrollTop = messagesArea.scrollHeight;
+            });
+        }
     </script>
 </body>
 </html>
