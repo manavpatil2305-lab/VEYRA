@@ -55,10 +55,10 @@
                 <span class="text-gray-400">🔍</span>
                 <input type="text" id="search-users-input" placeholder="Search username to chat..." class="bg-transparent outline-none text-sm w-full text-white">
             </div>
-            <!-- Search Results Dropdown -->
             <div id="search-results" class="hidden absolute top-14 left-4 right-4 bg-[#202C33] rounded-xl shadow-xl p-2 flex-col gap-1 max-h-60 overflow-y-auto"></div>
         </div>
 
+        <!-- Real-Time Inbox Area -->
         <main class="flex-1 overflow-y-auto relative pb-24" id="recent-chats-list">
             <div class="p-4 text-center text-gray-500 text-sm mt-10">Search a username above to start a private chat!</div>
         </main>
@@ -87,11 +87,28 @@
             <div>
                 <h2 id="settings-name" class="text-xl font-normal text-white">User</h2>
                 <p id="settings-username" class="text-sm text-[#25D366]">@username</p>
-                <p id="settings-following-count" class="text-xs text-gray-400 mt-1">Following: 0</p>
+                <p id="settings-following-count" class="text-xs text-gray-400 mt-1">Followers: 0 | Following: 0</p>
             </div>
         </div>
+
         <div class="p-4 mt-2">
-            <h3 class="text-[#25D366] text-sm font-semibold mb-4">PRIVACY</h3>
+            <h3 class="text-[#25D366] text-sm font-semibold mb-4">PRIVACY & PROFILE</h3>
+            
+            <!-- Insta-style Privacy Toggle -->
+            <div class="bg-[#111B21] rounded-xl p-4 shadow-sm mb-4">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h4 class="text-white text-lg">Private Account</h4>
+                        <p class="text-sm text-gray-400">Only approved followers can view your profile.</p>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                      <input type="checkbox" id="private-account-toggle" class="sr-only peer">
+                      <div class="w-11 h-6 bg-gray-600 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#25D366]"></div>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Disappearing Messages Settings -->
             <div class="bg-[#111B21] rounded-xl p-4 shadow-sm">
                 <h4 class="text-white text-lg">Default Message Timer</h4>
                 <select id="disappearing-timer" class="w-full mt-2 bg-[#202C33] text-white p-3 rounded-lg outline-none cursor-pointer">
@@ -109,8 +126,8 @@
     <div id="chat-room" class="hidden flex-col h-full w-full bg-[#0B141A] absolute top-0 left-0 z-50">
         <header class="pt-4 pb-2 px-4 flex items-center gap-4 bg-[#202C33] shadow-md z-10">
             <span id="back-btn" class="text-white text-2xl cursor-pointer px-2">←</span>
-            <div class="w-10 h-10 bg-gray-600 rounded-full flex-shrink-0" id="chat-header-pic" style="background-size: cover;"></div>
-            <div class="flex-1">
+            <div class="w-10 h-10 bg-gray-600 rounded-full flex-shrink-0 cursor-pointer" id="chat-header-pic" style="background-size: cover;"></div>
+            <div class="flex-1 cursor-pointer" id="chat-header-info">
                 <h2 class="text-lg font-medium text-white" id="chat-header-name">Name</h2>
                 <span class="text-xs text-[#25D366]" id="chat-header-username">@username</span>
             </div>
@@ -128,7 +145,6 @@
     </div>
 
     <script type="module">
-        // IMPORT UPDATED: Added updateDoc and deleteDoc for Blue Ticks and Deletion
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc, updateDoc, deleteDoc, collection, addDoc, query, where, getDocs, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
@@ -150,6 +166,7 @@
         let currentUser = null;
         let currentUserData = null;
         let activeChatId = null; 
+        let currentActiveChatUser = null; // Stores data of person you are chatting with
         let currentChatListener = null;
 
         const loginScreen = document.getElementById('login-screen');
@@ -182,7 +199,9 @@
                         if(currentUserData.photoUrl) document.getElementById('settings-profile-pic').style.backgroundImage = `url('${currentUserData.photoUrl}')`;
                         
                         showScreen(mainApp);
-                        loadFollowingList();
+                        
+                        // Load Inbox Chats
+                        loadInbox();
                     } else {
                         showScreen(usernameScreen);
                     }
@@ -195,10 +214,12 @@
             }
         });
 
-        function loadFollowingList() {
-            onSnapshot(collection(db, `users/${currentUser.uid}/following`), (snapshot) => {
-                document.getElementById('settings-following-count').textContent = `Following: ${snapshot.docs.length}`;
-                
+        // 1. DYNAMIC INBOX GENERATOR (WhatsApp Style)
+        function loadInbox() {
+            // Listens to your personal inbox folder
+            const q = query(collection(db, `users/${currentUser.uid}/inbox`), orderBy("timestamp", "desc"));
+            
+            onSnapshot(q, (snapshot) => {
                 if(snapshot.empty) {
                     recentChatsList.innerHTML = `<div class="p-4 text-center text-gray-500 text-sm mt-10">Search a username above to start a private chat!</div>`;
                     return;
@@ -206,25 +227,35 @@
 
                 recentChatsList.innerHTML = "";
                 snapshot.forEach((docSnap) => {
-                    const friend = docSnap.data();
+                    const chat = docSnap.data();
                     
+                    // Show a green dot if there is an unread message and it wasn't sent by you
+                    const unreadBadge = (!chat.isRead && chat.lastSenderId !== currentUser.uid) 
+                        ? `<div class="w-3 h-3 bg-[#25D366] rounded-full shadow-lg"></div>` 
+                        : '';
+
                     const div = document.createElement('div');
                     div.className = "flex items-center gap-4 px-4 py-3 hover:bg-[#202C33] cursor-pointer border-b border-[#202C33]/50";
                     div.innerHTML = `
-                        <div class="w-12 h-12 bg-gray-600 rounded-full flex-shrink-0" style="background-image: url('${friend.photoUrl}'); background-size: cover;"></div>
-                        <div class="flex-1 flex flex-col justify-center">
-                            <h2 class="text-lg font-normal text-white">${friend.name}</h2>
-                            <p class="text-sm text-gray-400 truncate">@${friend.username}</p>
+                        <div class="w-12 h-12 bg-gray-600 rounded-full flex-shrink-0" style="background-image: url('${chat.photoUrl}'); background-size: cover;"></div>
+                        <div class="flex-1 flex flex-col justify-center overflow-hidden">
+                            <div class="flex justify-between items-center">
+                                <h2 class="text-lg font-normal text-white truncate">${chat.name}</h2>
+                                ${unreadBadge}
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <p class="text-sm ${unreadBadge ? 'text-white font-medium' : 'text-gray-400'} truncate">${chat.lastMessage || ('@' + chat.username)}</p>
+                            </div>
                         </div>
                     `;
-                    div.addEventListener('click', () => openPrivateChat(friend));
+                    div.addEventListener('click', () => openPrivateChat(chat));
                     recentChatsList.appendChild(div);
                 });
             });
         }
 
         document.getElementById('google-login-btn').addEventListener('click', () => {
-            signInWithPopup(auth, provider).catch((e) => alert("Login cancelled or failed."));
+            signInWithPopup(auth, provider).catch((e) => alert("Login cancelled."));
         });
 
         document.getElementById('save-username-btn').addEventListener('click', async () => {
@@ -238,6 +269,7 @@
                     email: currentUser.email,
                     photoUrl: currentUser.photoURL,
                     username: rawUsername,
+                    isPrivate: false, // Default profile state
                     joinedAt: serverTimestamp()
                 });
                 window.location.reload();
@@ -248,6 +280,7 @@
 
         document.getElementById('logout-btn').addEventListener('click', () => signOut(auth));
 
+        // Search Users
         searchInput.addEventListener('input', async (e) => {
             const val = e.target.value.trim().toLowerCase();
             if(val.length < 2) { searchResults.classList.add('hidden'); return; }
@@ -273,17 +306,7 @@
                             <p class="text-xs text-[#25D366]">@${userObj.username}</p>
                         </div>
                     `;
-                    div.addEventListener('click', () => {
-                        setDoc(doc(db, `users/${currentUser.uid}/following/${userObj.uid}`), {
-                            uid: userObj.uid,
-                            name: userObj.name,
-                            username: userObj.username,
-                            photoUrl: userObj.photoUrl,
-                            followedAt: serverTimestamp()
-                        }, {merge: true});
-                        
-                        openPrivateChat(userObj);
-                    });
+                    div.addEventListener('click', () => openPrivateChat(userObj));
                     searchResults.appendChild(div);
                 });
 
@@ -302,12 +325,16 @@
             searchInput.value = "";
             searchResults.classList.add('hidden');
             
+            currentActiveChatUser = otherUser; 
             const uids = [currentUser.uid, otherUser.uid].sort();
             activeChatId = `${uids[0]}_${uids[1]}`;
 
             document.getElementById('chat-header-name').textContent = otherUser.name;
             document.getElementById('chat-header-username').textContent = "@" + otherUser.username;
             if(otherUser.photoUrl) document.getElementById('chat-header-pic').style.backgroundImage = `url('${otherUser.photoUrl}')`;
+
+            // Clear the unread badge in your inbox because you opened the chat
+            setDoc(doc(db, `users/${currentUser.uid}/inbox/${otherUser.uid}`), { isRead: true }, {merge: true}).catch(e => console.log(e));
 
             showScreen(chatRoom);
             loadPrivateMessages();
@@ -316,17 +343,19 @@
         document.getElementById('back-btn').addEventListener('click', () => {
             if(currentChatListener) currentChatListener();
             activeChatId = null;
+            currentActiveChatUser = null;
             showScreen(mainApp);
         });
 
         document.getElementById('send-btn').addEventListener('click', async () => {
             const text = document.getElementById('message-input').value.trim();
             const timer = document.getElementById('disappearing-timer').value;
-            if (!text || !activeChatId) return;
+            if (!text || !activeChatId || !currentActiveChatUser) return;
 
             document.getElementById('message-input').value = "";
+            
             try {
-                // ADDED: isRead flag set to false initially
+                // 1. Send Message to Chat Room
                 await addDoc(collection(db, `chats/${activeChatId}/messages`), {
                     text: text,
                     senderUid: currentUser.uid,
@@ -334,6 +363,31 @@
                     isRead: false,
                     timestamp: serverTimestamp()
                 });
+
+                // 2. Update Sender's Inbox (Your screen)
+                await setDoc(doc(db, `users/${currentUser.uid}/inbox/${currentActiveChatUser.uid}`), {
+                    uid: currentActiveChatUser.uid,
+                    name: currentActiveChatUser.name,
+                    username: currentActiveChatUser.username,
+                    photoUrl: currentActiveChatUser.photoUrl,
+                    lastMessage: text,
+                    lastSenderId: currentUser.uid,
+                    isRead: true, // You read your own message
+                    timestamp: serverTimestamp()
+                }, {merge: true});
+
+                // 3. Update Receiver's Inbox (Pops up on THEIR screen automatically)
+                await setDoc(doc(db, `users/${currentActiveChatUser.uid}/inbox/${currentUser.uid}`), {
+                    uid: currentUser.uid,
+                    name: currentUserData.name,
+                    username: currentUserData.username,
+                    photoUrl: currentUserData.photoUrl,
+                    lastMessage: text,
+                    lastSenderId: currentUser.uid,
+                    isRead: false, // Triggers the green unread dot for them
+                    timestamp: serverTimestamp()
+                }, {merge: true});
+
             } catch(e) {
                 alert("Message failed. Check database rules.");
             }
@@ -355,37 +409,26 @@
                     const msg = docSnap.data();
                     const msgId = docSnap.id;
                     const isMe = msg.senderUid === currentUser.uid;
-                    
                     const msgRef = doc(db, `chats/${activeChatId}/messages`, msgId);
 
-                    // LOGIC 1: Read Receipts (Blue Ticks) & View Once Auto-Delete
+                    // READ RECEIPTS & AUTO-DELETE LOGIC
                     if (!isMe && !msg.isRead) {
-                        // Mark as read in database (Turns ticks blue for sender)
                         updateDoc(msgRef, { isRead: true }).catch(console.error);
-
-                        // If it's a "View Once" message, delete it 10 seconds after it is read
                         if (msg.timer === "view-once") {
-                            setTimeout(() => {
-                                deleteDoc(msgRef).catch(console.error);
-                            }, 10000); 
+                            setTimeout(() => { deleteDoc(msgRef).catch(console.error); }, 10000); 
                         }
                     }
 
-                    // LOGIC 2: Time-based Auto-Delete (7-hours or 24-hours)
                     if (msg.timer === "7-hours" || msg.timer === "24-hours") {
                         const hours = msg.timer === "7-hours" ? 7 : 24;
                         const msgTime = msg.timestamp ? msg.timestamp.toMillis() : Date.now();
-                        // If current time minus message time is greater than limit, delete it
                         if (Date.now() - msgTime > hours * 60 * 60 * 1000) {
                             deleteDoc(msgRef).catch(console.error);
-                            return; // Do not render this message on screen
+                            return; 
                         }
                     }
 
-                    // RENDER UI
                     const timerIcon = msg.timer && msg.timer !== "off" ? "⏱️" : "";
-                    
-                    // Determine tick color: Blue if read, Grey if not read
                     const tickColor = msg.isRead ? "text-[#34B7F1]" : "text-gray-400";
                     const ticksHtml = isMe ? `<span class="${tickColor} font-bold text-xs tracking-tighter">✓✓</span>` : '';
 
@@ -407,7 +450,7 @@
             });
         }
 
-        // Navigation Actions
+        // Settings / Nav
         document.getElementById('nav-settings').addEventListener('click', () => showScreen(settingsScreen));
         document.getElementById('nav-chats').addEventListener('click', () => showScreen(mainApp));
         document.getElementById('settings-back-btn').addEventListener('click', () => showScreen(mainApp));
