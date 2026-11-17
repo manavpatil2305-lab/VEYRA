@@ -49,7 +49,6 @@
             </div>
         </header>
 
-        <!-- Search Bar -->
         <div class="px-4 py-2 relative z-40">
             <div class="bg-[#202C33] rounded-full flex items-center px-4 py-2 gap-3">
                 <span class="text-gray-400">🔍</span>
@@ -61,20 +60,39 @@
         <main class="flex-1 overflow-y-auto relative pb-24" id="recent-chats-list">
             <div class="p-4 text-center text-gray-500 text-sm mt-10">Search a username above to connect with people!</div>
         </main>
-
-        <nav class="bg-[#0B141A] border-t border-[#202C33] flex justify-around items-center px-2 py-2 pb-4 absolute bottom-0 w-full z-20">
-            <div id="nav-chats" class="flex flex-col items-center gap-1 cursor-pointer w-20">
-                <div class="relative px-4 py-1 bg-[#0A332C] rounded-full"><span class="text-white text-xl">💬</span></div>
-                <span class="text-xs text-white font-medium">Chats</span>
-            </div>
-            <div id="nav-settings" class="flex flex-col items-center gap-1 cursor-pointer opacity-60 w-20">
-                <div class="relative px-4 py-1 rounded-full"><span class="text-white text-xl">⚙️</span></div>
-                <span class="text-xs text-white">Settings</span>
-            </div>
-        </nav>
     </div>
 
-    <!-- INSTA-STYLE PROFILE SCREEN -->
+    <!-- ACTIVITY SCREEN (NEW) -->
+    <div id="activity-screen" class="hidden flex-col h-full w-full bg-[#0B141A] absolute top-0 left-0 z-30 pb-20">
+        <header class="pt-6 pb-4 px-4 border-b border-[#202C33] flex items-center gap-4">
+            <h1 class="text-2xl font-bold text-white">Activity</h1>
+        </header>
+        <main class="flex-1 overflow-y-auto relative" id="activity-list">
+            <div class="p-4 text-center text-gray-500 text-sm mt-10">No new notifications.</div>
+        </main>
+    </div>
+
+    <!-- GLOBAL BOTTOM NAVIGATION (UPDATED) -->
+    <nav class="bg-[#0B141A] border-t border-[#202C33] flex justify-around items-center px-2 py-2 pb-4 absolute bottom-0 w-full z-40">
+        <div id="nav-chats" class="flex flex-col items-center gap-1 cursor-pointer w-20">
+            <div id="nav-chats-icon" class="relative px-4 py-1 bg-[#0A332C] rounded-full"><span class="text-white text-xl">💬</span></div>
+            <span class="text-xs text-white font-medium">Chats</span>
+        </div>
+        <div id="nav-activity" class="flex flex-col items-center gap-1 cursor-pointer opacity-60 w-20">
+            <div id="nav-activity-icon" class="relative px-4 py-1 rounded-full">
+                <span class="text-white text-xl">❤️</span>
+                <!-- Red dot for new requests -->
+                <div id="activity-badge" class="hidden absolute top-1 right-2 w-3 h-3 bg-red-500 rounded-full border-2 border-[#0B141A]"></div>
+            </div>
+            <span class="text-xs text-white">Activity</span>
+        </div>
+        <div id="nav-settings" class="flex flex-col items-center gap-1 cursor-pointer opacity-60 w-20">
+            <div id="nav-settings-icon" class="relative px-4 py-1 rounded-full"><span class="text-white text-xl">⚙️</span></div>
+            <span class="text-xs text-white">Settings</span>
+        </div>
+    </nav>
+
+    <!-- INSTA-STYLE PROFILE SCREEN (UPDATED) -->
     <div id="user-profile-screen" class="hidden flex-col h-full w-full bg-[#0B141A] absolute top-0 left-0 z-40 pb-20 overflow-y-auto">
         <header class="pt-6 pb-4 px-4 flex items-center gap-4">
             <span id="profile-back-btn" class="text-white text-2xl cursor-pointer px-2">←</span>
@@ -86,28 +104,35 @@
             <h2 id="profile-page-name" class="text-2xl font-bold text-white">Name</h2>
             <p id="profile-page-bio" class="text-sm text-gray-400 mt-1">Veyra User</p>
             
-            <div class="flex gap-8 mt-6 w-full justify-center px-8">
+            <!-- Follow Stats (Hides if Private & Not Following) -->
+            <div id="profile-stats-container" class="flex gap-8 mt-6 w-full justify-center px-8">
                 <div class="flex flex-col items-center">
-                    <span id="profile-followers-count" class="text-xl font-bold text-white">0</span>
+                    <span id="profile-followers-count" class="text-xl font-bold text-white">-</span>
                     <span class="text-xs text-gray-400">Followers</span>
                 </div>
                 <div class="flex flex-col items-center">
-                    <span id="profile-following-count" class="text-xl font-bold text-white">0</span>
+                    <span id="profile-following-count" class="text-xl font-bold text-white">-</span>
                     <span class="text-xs text-gray-400">Following</span>
                 </div>
             </div>
 
+            <!-- Private Account Lock Warning -->
+            <div id="profile-private-warning" class="hidden flex-col items-center mt-6 px-8 text-center">
+                <span class="text-4xl mb-2">🔒</span>
+                <h3 class="text-white font-bold">This Account is Private</h3>
+                <p class="text-sm text-gray-400 mt-1">Follow this account to see their activity and send messages.</p>
+            </div>
+
             <div class="flex gap-3 w-full px-6 mt-8">
                 <button id="profile-follow-btn" class="flex-1 bg-[#25D366] text-[#0B141A] font-bold py-2 rounded-lg transition-colors">Follow</button>
-                <button id="profile-message-btn" class="flex-1 bg-[#202C33] text-white font-bold py-2 rounded-lg">Message</button>
+                <button id="profile-message-btn" class="flex-1 bg-[#202C33] text-white font-bold py-2 rounded-lg hidden">Message</button>
             </div>
         </div>
     </div>
 
-    <!-- SETTINGS SCREEN -->
+    <!-- SETTINGS SCREEN (UPDATED) -->
     <div id="settings-screen" class="hidden flex-col h-full w-full bg-[#0B141A] absolute top-0 left-0 z-30 pb-20 overflow-y-auto">
         <header class="pt-6 pb-4 px-4 border-b border-[#202C33] flex items-center gap-4">
-            <span id="settings-back-btn" class="text-white text-2xl cursor-pointer px-2">←</span>
             <h1 class="text-2xl font-bold text-white">Settings</h1>
         </header>
         
@@ -122,6 +147,7 @@
 
         <div class="p-4 mt-2">
             <h3 class="text-[#25D366] text-sm font-semibold mb-4">PRIVACY & PROFILE</h3>
+            
             <div class="bg-[#111B21] rounded-xl p-4 shadow-sm mb-4">
                 <div class="flex justify-between items-center">
                     <div>
@@ -194,13 +220,15 @@
         let currentActiveChatUser = null; 
         let currentChatListener = null;
 
-        let viewingProfileUser = null; // Stores data for the profile currently being viewed
+        let viewingProfileUser = null; 
         let isFollowingTarget = false;
+        let hasRequestedTarget = false;
 
         const screens = {
             login: document.getElementById('login-screen'),
             username: document.getElementById('username-screen'),
             main: document.getElementById('main-app'),
+            activity: document.getElementById('activity-screen'),
             settings: document.getElementById('settings-screen'),
             profile: document.getElementById('user-profile-screen'),
             chat: document.getElementById('chat-room')
@@ -212,6 +240,16 @@
             });
             screens[screenName].classList.remove('hidden');
             screens[screenName].classList.add('flex');
+            
+            // Bottom Nav UI Updates
+            if(['main', 'activity', 'settings'].includes(screenName)) {
+                ['chats', 'activity', 'settings'].forEach(nav => {
+                    document.getElementById(`nav-${nav}`).classList.add('opacity-60');
+                    document.getElementById(`nav-${nav}-icon`).classList.remove('bg-[#0A332C]');
+                });
+                document.getElementById(`nav-${screenName === 'main' ? 'chats' : screenName}`).classList.remove('opacity-60');
+                document.getElementById(`nav-${screenName === 'main' ? 'chats' : screenName}-icon`).classList.add('bg-[#0A332C]');
+            }
         }
 
         onAuthStateChanged(auth, async (user) => {
@@ -221,13 +259,17 @@
                     const userDoc = await getDoc(doc(db, "users", user.uid));
                     if (userDoc.exists() && userDoc.data().username) {
                         currentUserData = userDoc.data();
+                        
+                        // Setup Settings
                         document.getElementById('settings-name').textContent = currentUserData.name;
                         document.getElementById('settings-username').textContent = "@" + currentUserData.username;
                         if(currentUserData.photoUrl) document.getElementById('settings-profile-pic').style.backgroundImage = `url('${currentUserData.photoUrl}')`;
-                        
+                        document.getElementById('private-account-toggle').checked = currentUserData.isPrivate === true;
+
                         showScreen('main');
                         loadInbox();
-                        watchMyStats(); // Live followers/following counter for Settings
+                        watchMyStats(); 
+                        loadActivityTab(); // NEW: Load Notifications
                     } else {
                         showScreen('username');
                     }
@@ -240,13 +282,79 @@
             }
         });
 
+        // Toggle Private Account
+        document.getElementById('private-account-toggle').addEventListener('change', async (e) => {
+            const isPrivate = e.target.checked;
+            await updateDoc(doc(db, "users", currentUser.uid), { isPrivate: isPrivate });
+            currentUserData.isPrivate = isPrivate;
+        });
+
+        function watchMyStats() {
+            onSnapshot(collection(db, `users/${currentUser.uid}/followers`), (snap) => {
+                const followers = snap.size;
+                onSnapshot(collection(db, `users/${currentUser.uid}/following`), (snap2) => {
+                    const following = snap2.size;
+                    document.getElementById('settings-stats').textContent = `Followers: ${followers} | Following: ${following}`;
+                });
+            });
+        }
+
+        // LOAD ACTIVITY (Follow Requests)
+        function loadActivityTab() {
+            onSnapshot(collection(db, `users/${currentUser.uid}/activity`), (snapshot) => {
+                const list = document.getElementById('activity-list');
+                const badge = document.getElementById('activity-badge');
+                
+                if(snapshot.empty) {
+                    badge.classList.add('hidden');
+                    list.innerHTML = `<div class="p-4 text-center text-gray-500 text-sm mt-10">No new notifications.</div>`;
+                    return;
+                }
+                
+                badge.classList.remove('hidden');
+                list.innerHTML = "";
+                
+                snapshot.forEach((docSnap) => {
+                    const req = docSnap.data();
+                    const reqId = docSnap.id;
+                    
+                    const div = document.createElement('div');
+                    div.className = "flex items-center gap-3 p-4 border-b border-[#202C33]/50";
+                    div.innerHTML = `
+                        <div class="w-10 h-10 bg-gray-600 rounded-full flex-shrink-0" style="background-image: url('${req.photoUrl}'); background-size: cover;"></div>
+                        <div class="flex-1">
+                            <p class="text-sm text-white"><span class="font-bold">${req.username}</span> requested to follow you.</p>
+                        </div>
+                        <div class="flex gap-2">
+                            <button class="accept-btn bg-[#25D366] text-[#0B141A] font-bold px-3 py-1 rounded-lg text-xs">Confirm</button>
+                            <button class="decline-btn bg-[#202C33] text-white font-bold px-3 py-1 rounded-lg text-xs">Delete</button>
+                        </div>
+                    `;
+                    
+                    div.querySelector('.accept-btn').addEventListener('click', async () => {
+                        // Add to followers & following
+                        await setDoc(doc(db, `users/${currentUser.uid}/followers/${req.uid}`), { uid: req.uid, timestamp: serverTimestamp() });
+                        await setDoc(doc(db, `users/${req.uid}/following/${currentUser.uid}`), { uid: currentUser.uid, timestamp: serverTimestamp() });
+                        // Delete request
+                        await deleteDoc(doc(db, `users/${currentUser.uid}/activity/${reqId}`));
+                    });
+
+                    div.querySelector('.decline-btn').addEventListener('click', async () => {
+                        await deleteDoc(doc(db, `users/${currentUser.uid}/activity/${reqId}`));
+                    });
+
+                    list.appendChild(div);
+                });
+            });
+        }
+
         // Inbox Generator
         function loadInbox() {
             const q = query(collection(db, `users/${currentUser.uid}/inbox`), orderBy("timestamp", "desc"));
             onSnapshot(q, (snapshot) => {
                 const list = document.getElementById('recent-chats-list');
                 if(snapshot.empty) {
-                    list.innerHTML = `<div class="p-4 text-center text-gray-500 text-sm mt-10">Search a username above to start a private chat!</div>`;
+                    list.innerHTML = `<div class="p-4 text-center text-gray-500 text-sm mt-10">Search a username above to connect with people!</div>`;
                     return;
                 }
                 list.innerHTML = "";
@@ -258,9 +366,7 @@
                     const div = document.createElement('div');
                     div.className = "flex items-center gap-4 px-4 py-3 hover:bg-[#202C33] cursor-pointer border-b border-[#202C33]/50";
                     div.innerHTML = `
-                        <!-- Clicking avatar opens Profile -->
                         <div class="w-12 h-12 bg-gray-600 rounded-full flex-shrink-0 avatar-btn" style="background-image: url('${chat.photoUrl}'); background-size: cover;"></div>
-                        <!-- Clicking text opens Chat -->
                         <div class="flex-1 flex flex-col justify-center overflow-hidden chat-btn">
                             <div class="flex justify-between items-center">
                                 <h2 class="text-lg font-normal text-white truncate">${chat.name}</h2>
@@ -272,8 +378,7 @@
                         </div>
                     `;
                     div.querySelector('.avatar-btn').addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        openProfileScreen(chat);
+                        e.stopPropagation(); openProfileScreen(chat);
                     });
                     div.querySelector('.chat-btn').addEventListener('click', () => openPrivateChat(chat));
                     list.appendChild(div);
@@ -281,35 +386,20 @@
             });
         }
 
-        // Live stats for your own Settings Page
-        function watchMyStats() {
-            onSnapshot(collection(db, `users/${currentUser.uid}/followers`), (snap) => {
-                const followers = snap.size;
-                onSnapshot(collection(db, `users/${currentUser.uid}/following`), (snap2) => {
-                    const following = snap2.size;
-                    document.getElementById('settings-stats').textContent = `Followers: ${followers} | Following: ${following}`;
-                });
-            });
-        }
-
         document.getElementById('google-login-btn').addEventListener('click', () => signInWithPopup(auth, provider));
         document.getElementById('logout-btn').addEventListener('click', () => signOut(auth));
+        
         document.getElementById('save-username-btn').addEventListener('click', async () => {
             const rawUsername = document.getElementById('username-input').value.trim().toLowerCase();
             if(rawUsername.length < 3) return alert("Username must be at least 3 characters");
             await setDoc(doc(db, "users", currentUser.uid), {
-                uid: currentUser.uid,
-                name: currentUser.displayName,
-                email: currentUser.email,
-                photoUrl: currentUser.photoURL,
-                username: rawUsername,
-                isPrivate: false,
-                joinedAt: serverTimestamp()
+                uid: currentUser.uid, name: currentUser.displayName, email: currentUser.email,
+                photoUrl: currentUser.photoURL, username: rawUsername, isPrivate: false, joinedAt: serverTimestamp()
             });
             window.location.reload();
         });
 
-        // Search Users (Opens Profile Instead of Chat)
+        // Search Users
         const searchInput = document.getElementById('search-users-input');
         const searchResults = document.getElementById('search-results');
         
@@ -333,7 +423,7 @@
                     <div class="w-10 h-10 bg-gray-600 rounded-full flex-shrink-0" style="background-image: url('${userObj.photoUrl}'); background-size: cover;"></div>
                     <div>
                         <h4 class="text-white text-sm truncate">${userObj.name}</h4>
-                        <p class="text-xs text-[#25D366]">@${userObj.username}</p>
+                        <p class="text-xs text-gray-400">@${userObj.username} ${userObj.isPrivate ? '🔒' : ''}</p>
                     </div>
                 `;
                 div.addEventListener('click', () => {
@@ -351,29 +441,50 @@
             if(e.target !== searchInput) searchResults.classList.add('hidden');
         });
 
-        // INSTA PROFILE ENGINE LOGIC
+        // PROFILE ENGINE
         async function openProfileScreen(targetUser) {
             viewingProfileUser = targetUser;
             
-            // Populate UI
             document.getElementById('profile-header-username').textContent = "@" + targetUser.username;
             document.getElementById('profile-page-name').textContent = targetUser.name;
             if(targetUser.photoUrl) document.getElementById('profile-page-pic').style.backgroundImage = `url('${targetUser.photoUrl}')`;
             
             showScreen('profile');
 
-            // Listen to their followers/following counts live
-            onSnapshot(collection(db, `users/${targetUser.uid}/followers`), (snap) => {
+            const statsContainer = document.getElementById('profile-stats-container');
+            const privateWarning = document.getElementById('profile-private-warning');
+            const msgBtn = document.getElementById('profile-message-btn');
+            const followBtn = document.getElementById('profile-follow-btn');
+
+            // Listen to Followers
+            onSnapshot(collection(db, `users/${targetUser.uid}/followers`), async (snap) => {
                 document.getElementById('profile-followers-count').textContent = snap.size;
                 
-                // Check if you are in their followers list
                 isFollowingTarget = false;
                 snap.forEach(doc => { if(doc.id === currentUser.uid) isFollowingTarget = true; });
+
+                // Check for pending request
+                const reqDoc = await getDoc(doc(db, `users/${targetUser.uid}/activity/${currentUser.uid}`));
+                hasRequestedTarget = reqDoc.exists();
+
+                // Profile Locking Logic
+                if (targetUser.isPrivate && !isFollowingTarget) {
+                    statsContainer.classList.add('hidden');
+                    privateWarning.classList.remove('hidden');
+                    msgBtn.classList.add('hidden');
+                } else {
+                    statsContainer.classList.remove('hidden');
+                    privateWarning.classList.add('hidden');
+                    msgBtn.classList.remove('hidden');
+                }
                 
-                const followBtn = document.getElementById('profile-follow-btn');
+                // Button State Logic
                 if (isFollowingTarget) {
                     followBtn.textContent = "Following";
                     followBtn.className = "flex-1 bg-[#202C33] text-white font-bold py-2 rounded-lg transition-colors";
+                } else if (hasRequestedTarget) {
+                    followBtn.textContent = "Requested";
+                    followBtn.className = "flex-1 bg-[#202C33] text-white font-bold py-2 rounded-lg transition-colors opacity-70";
                 } else {
                     followBtn.textContent = "Follow";
                     followBtn.className = "flex-1 bg-[#25D366] text-[#0B141A] font-bold py-2 rounded-lg transition-colors";
@@ -385,23 +496,34 @@
             });
         }
 
-        // Handle Follow/Unfollow Click
+        // Handle Follow / Request
         document.getElementById('profile-follow-btn').addEventListener('click', async () => {
             if(!viewingProfileUser) return;
             const targetId = viewingProfileUser.uid;
             
             if (isFollowingTarget) {
-                // UNFOLLOW: Remove from both databases
+                // UNFOLLOW
                 await deleteDoc(doc(db, `users/${targetId}/followers/${currentUser.uid}`));
                 await deleteDoc(doc(db, `users/${currentUser.uid}/following/${targetId}`));
+            } else if (hasRequestedTarget) {
+                // CANCEL REQUEST
+                await deleteDoc(doc(db, `users/${targetId}/activity/${currentUser.uid}`));
+                hasRequestedTarget = false;
             } else {
-                // FOLLOW: Add to both databases (Instant for public accounts)
-                await setDoc(doc(db, `users/${targetId}/followers/${currentUser.uid}`), {
-                    uid: currentUser.uid, timestamp: serverTimestamp()
-                });
-                await setDoc(doc(db, `users/${currentUser.uid}/following/${targetId}`), {
-                    uid: targetId, timestamp: serverTimestamp()
-                });
+                if (viewingProfileUser.isPrivate) {
+                    // SEND REQUEST
+                    await setDoc(doc(db, `users/${targetId}/activity/${currentUser.uid}`), {
+                        type: 'follow_request',
+                        uid: currentUser.uid, username: currentUserData.username,
+                        name: currentUserData.name, photoUrl: currentUserData.photoUrl,
+                        timestamp: serverTimestamp()
+                    });
+                    hasRequestedTarget = true;
+                } else {
+                    // INSTANT FOLLOW
+                    await setDoc(doc(db, `users/${targetId}/followers/${currentUser.uid}`), { uid: currentUser.uid, timestamp: serverTimestamp() });
+                    await setDoc(doc(db, `users/${currentUser.uid}/following/${targetId}`), { uid: targetId, timestamp: serverTimestamp() });
+                }
             }
         });
 
@@ -418,14 +540,12 @@
             document.getElementById('chat-header-username').textContent = "@" + otherUser.username;
             if(otherUser.photoUrl) document.getElementById('chat-header-pic').style.backgroundImage = `url('${otherUser.photoUrl}')`;
 
-            // Clear unread dot on your end
             setDoc(doc(db, `users/${currentUser.uid}/inbox/${otherUser.uid}`), { isRead: true }, {merge: true}).catch(e=>{});
 
             showScreen('chat');
             loadPrivateMessages();
         }
 
-        // Header click inside chat goes to profile
         document.getElementById('chat-header-pic').addEventListener('click', () => openProfileScreen(currentActiveChatUser));
         document.getElementById('chat-header-info').addEventListener('click', () => openProfileScreen(currentActiveChatUser));
 
@@ -444,26 +564,20 @@
             document.getElementById('message-input').value = "";
             
             try {
-                // Send to Chat Room
                 await addDoc(collection(db, `chats/${activeChatId}/messages`), {
                     text: text, senderUid: currentUser.uid, timer: timer, isRead: false, timestamp: serverTimestamp()
                 });
 
-                // Update My Inbox
                 await setDoc(doc(db, `users/${currentUser.uid}/inbox/${currentActiveChatUser.uid}`), {
                     uid: currentActiveChatUser.uid, name: currentActiveChatUser.name, username: currentActiveChatUser.username,
                     photoUrl: currentActiveChatUser.photoUrl, lastMessage: text, lastSenderId: currentUser.uid, isRead: true, timestamp: serverTimestamp()
                 }, {merge: true});
 
-                // Update Their Inbox (Triggers green dot for them)
                 await setDoc(doc(db, `users/${currentActiveChatUser.uid}/inbox/${currentUser.uid}`), {
                     uid: currentUser.uid, name: currentUserData.name, username: currentUserData.username,
                     photoUrl: currentUserData.photoUrl, lastMessage: text, lastSenderId: currentUser.uid, isRead: false, timestamp: serverTimestamp()
                 }, {merge: true});
-
-            } catch(e) {
-                alert("Message failed.");
-            }
+            } catch(e) { alert("Message failed."); }
         });
 
         document.getElementById('message-input').addEventListener('keypress', (e) => {
@@ -511,9 +625,10 @@
             });
         }
 
+        // Nav Mapping
         document.getElementById('nav-settings').addEventListener('click', () => showScreen('settings'));
+        document.getElementById('nav-activity').addEventListener('click', () => showScreen('activity'));
         document.getElementById('nav-chats').addEventListener('click', () => showScreen('main'));
-        document.getElementById('settings-back-btn').addEventListener('click', () => showScreen('main'));
         document.getElementById('main-menu-btn').addEventListener('click', () => showScreen('settings'));
         
     </script>
