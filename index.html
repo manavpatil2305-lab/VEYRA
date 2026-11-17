@@ -15,7 +15,7 @@
 <body class="bg-[#0B141A] text-[#E9EDEF] font-sans h-screen flex flex-col overflow-hidden relative">
 
     <!-- LOGIN SCREEN -->
-    <div id="login-screen" class="h-full flex flex-col items-center justify-center px-6 absolute top-0 left-0 w-full bg-[#0B141A] z-50">
+    <div id="login-screen" class="flex h-full flex-col items-center justify-center px-6 absolute top-0 left-0 w-full bg-[#0B141A] z-50">
         <h1 class="text-4xl font-bold text-white mb-8">veyra</h1>
         <p class="text-gray-400 mb-8 text-center">Sign in securely to start messaging</p>
         <button id="google-login-btn" class="w-full max-w-sm bg-white text-black font-bold py-3 px-4 rounded-full shadow-lg flex items-center justify-center gap-3 cursor-pointer">
@@ -30,7 +30,7 @@
     </div>
 
     <!-- CHOOSE USERNAME SCREEN -->
-    <div id="username-screen" class="hidden h-full flex flex-col items-center justify-center px-6 absolute top-0 left-0 w-full bg-[#0B141A] z-50">
+    <div id="username-screen" class="hidden h-full flex-col items-center justify-center px-6 absolute top-0 left-0 w-full bg-[#0B141A] z-50">
         <h2 class="text-2xl font-bold text-white mb-2">Create your Veyra ID</h2>
         <p class="text-gray-400 mb-8 text-center text-sm">This is how friends will find you. No emails shared.</p>
         <div class="w-full max-w-sm bg-[#202C33] rounded-lg p-4 flex items-center gap-3 mb-6">
@@ -123,9 +123,9 @@
     </div>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-app.js";
-        import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, collection, addDoc, query, where, getDocs, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-firestore.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc, collection, addDoc, query, where, getDocs, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCAqrAiYLLnFoa_JmU8A3jXPk0KoZukCVk",
@@ -153,24 +153,37 @@
         const searchInput = document.getElementById('search-users-input');
         const searchResults = document.getElementById('search-results');
         
-        // Instant Auth Handler with safe screen display
+        function showScreen(screenEl) {
+            // Force hide all main screens first
+            [loginScreen, usernameScreen, mainApp, document.getElementById('settings-screen'), chatRoom].forEach(el => {
+                if(el) { el.classList.add('hidden'); el.classList.remove('flex'); }
+            });
+            // Show target screen
+            screenEl.classList.remove('hidden');
+            screenEl.classList.add('flex');
+        }
+
+        // Safe Auth Handler - Guarantees no blank screens
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 currentUser = user;
-                loginScreen.classList.add('hidden');
-                loginScreen.classList.remove('flex');
-
-                const userDoc = await getDoc(doc(db, "users", user.uid));
-                
-                if (userDoc.exists() && userDoc.data().username) {
-                    currentUserData = userDoc.data();
-                    document.getElementById('settings-name').textContent = currentUserData.name;
-                    document.getElementById('settings-username').textContent = "@" + currentUserData.username;
-                    if(currentUserData.photoUrl) document.getElementById('settings-profile-pic').style.backgroundImage = `url('${currentUserData.photoUrl}')`;
+                try {
+                    const userDoc = await getDoc(doc(db, "users", user.uid));
                     
-                    showScreen(mainApp);
-                } else {
-                    showScreen(usernameScreen); // Safely prompt for username creation
+                    if (userDoc.exists() && userDoc.data().username) {
+                        currentUserData = userDoc.data();
+                        document.getElementById('settings-name').textContent = currentUserData.name;
+                        document.getElementById('settings-username').textContent = "@" + currentUserData.username;
+                        if(currentUserData.photoUrl) document.getElementById('settings-profile-pic').style.backgroundImage = `url('${currentUserData.photoUrl}')`;
+                        
+                        showScreen(mainApp);
+                    } else {
+                        showScreen(usernameScreen);
+                    }
+                } catch (error) {
+                    console.error("Database error:", error);
+                    alert("Firestore blocked the request! Check your database rules.");
+                    showScreen(usernameScreen); 
                 }
             } else {
                 showScreen(loginScreen);
@@ -178,22 +191,26 @@
         });
 
         document.getElementById('google-login-btn').addEventListener('click', () => {
-            signInWithPopup(auth, provider);
+            signInWithPopup(auth, provider).catch((e) => alert("Login cancelled or failed."));
         });
 
         document.getElementById('save-username-btn').addEventListener('click', async () => {
             const rawUsername = document.getElementById('username-input').value.trim().toLowerCase();
             if(rawUsername.length < 3) return alert("Username must be at least 3 characters");
 
-            await setDoc(doc(db, "users", currentUser.uid), {
-                uid: currentUser.uid,
-                name: currentUser.displayName,
-                email: currentUser.email,
-                photoUrl: currentUser.photoURL,
-                username: rawUsername,
-                joinedAt: serverTimestamp()
-            });
-            window.location.reload();
+            try {
+                await setDoc(doc(db, "users", currentUser.uid), {
+                    uid: currentUser.uid,
+                    name: currentUser.displayName,
+                    email: currentUser.email,
+                    photoUrl: currentUser.photoURL,
+                    username: rawUsername,
+                    joinedAt: serverTimestamp()
+                });
+                window.location.reload();
+            } catch (error) {
+                alert("Failed to save. Make sure your Firestore Rules are in test mode.");
+            }
         });
 
         document.getElementById('logout-btn').addEventListener('click', () => signOut(auth));
@@ -203,32 +220,36 @@
             const val = e.target.value.trim().toLowerCase();
             if(val.length < 2) { searchResults.classList.add('hidden'); return; }
 
-            const q = query(collection(db, "users"), where("username", ">=", val), where("username", "<=", val + '\uf8ff'));
-            const querySnapshot = await getDocs(q);
-            
-            searchResults.innerHTML = "";
-            let found = false;
-
-            querySnapshot.forEach((docSnap) => {
-                const userObj = docSnap.data();
-                if(userObj.uid === currentUser.uid) return;
-                found = true;
+            try {
+                const q = query(collection(db, "users"), where("username", ">=", val), where("username", "<=", val + '\uf8ff'));
+                const querySnapshot = await getDocs(q);
                 
-                const div = document.createElement('div');
-                div.className = "flex items-center gap-3 p-2 hover:bg-[#2A3942] rounded-lg cursor-pointer";
-                div.innerHTML = `
-                    <div class="w-10 h-10 bg-gray-600 rounded-full" style="background-image: url('${userObj.photoUrl}'); background-size: cover;"></div>
-                    <div>
-                        <h4 class="text-white text-sm">${userObj.name}</h4>
-                        <p class="text-xs text-[#25D366]">@${userObj.username}</p>
-                    </div>
-                `;
-                div.addEventListener('click', () => openPrivateChat(userObj));
-                searchResults.appendChild(div);
-            });
+                searchResults.innerHTML = "";
+                let found = false;
 
-            if(!found) searchResults.innerHTML = `<div class="p-2 text-gray-400 text-sm">No users found</div>`;
-            searchResults.classList.remove('hidden');
+                querySnapshot.forEach((docSnap) => {
+                    const userObj = docSnap.data();
+                    if(userObj.uid === currentUser.uid) return;
+                    found = true;
+                    
+                    const div = document.createElement('div');
+                    div.className = "flex items-center gap-3 p-2 hover:bg-[#2A3942] rounded-lg cursor-pointer";
+                    div.innerHTML = `
+                        <div class="w-10 h-10 bg-gray-600 rounded-full" style="background-image: url('${userObj.photoUrl}'); background-size: cover;"></div>
+                        <div>
+                            <h4 class="text-white text-sm">${userObj.name}</h4>
+                            <p class="text-xs text-[#25D366]">@${userObj.username}</p>
+                        </div>
+                    `;
+                    div.addEventListener('click', () => openPrivateChat(userObj));
+                    searchResults.appendChild(div);
+                });
+
+                if(!found) searchResults.innerHTML = `<div class="p-2 text-gray-400 text-sm">No users found</div>`;
+                searchResults.classList.remove('hidden');
+            } catch (err) {
+                console.error(err);
+            }
         });
 
         document.addEventListener('click', (e) => {
@@ -262,12 +283,16 @@
             if (!text || !activeChatId) return;
 
             document.getElementById('message-input').value = "";
-            await addDoc(collection(db, `chats/${activeChatId}/messages`), {
-                text: text,
-                senderUid: currentUser.uid,
-                timer: timer,
-                timestamp: serverTimestamp()
-            });
+            try {
+                await addDoc(collection(db, `chats/${activeChatId}/messages`), {
+                    text: text,
+                    senderUid: currentUser.uid,
+                    timer: timer,
+                    timestamp: serverTimestamp()
+                });
+            } catch(e) {
+                alert("Message failed. Check database rules.");
+            }
         });
 
         document.getElementById('message-input').addEventListener('keypress', (e) => {
@@ -301,14 +326,6 @@
                 });
                 messagesArea.scrollTop = messagesArea.scrollHeight;
             });
-        }
-
-        function showScreen(screenEl) {
-            [loginScreen, usernameScreen, mainApp, document.getElementById('settings-screen'), chatRoom].forEach(el => {
-                if(el) { el.classList.add('hidden'); el.classList.remove('flex'); }
-            });
-            screenEl.classList.remove('hidden');
-            screenEl.classList.add('flex');
         }
 
         document.getElementById('nav-settings').addEventListener('click', () => showScreen(document.getElementById('settings-screen')));
