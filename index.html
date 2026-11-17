@@ -60,39 +60,46 @@
         <main class="flex-1 overflow-y-auto relative pb-24" id="recent-chats-list">
             <div class="p-4 text-center text-gray-500 text-sm mt-10">Search a username above to connect with people!</div>
         </main>
+
+        <nav class="bg-[#0B141A] border-t border-[#202C33] flex justify-around items-center px-2 py-2 pb-4 absolute bottom-0 w-full z-20">
+            <div id="nav-chats" class="flex flex-col items-center gap-1 cursor-pointer w-20">
+                <div id="nav-chats-icon" class="relative px-4 py-1 bg-[#0A332C] rounded-full"><span class="text-white text-xl">💬</span></div>
+                <span class="text-xs text-white font-medium">Chats</span>
+            </div>
+            <div id="nav-activity" class="flex flex-col items-center gap-1 cursor-pointer opacity-60 w-20">
+                <div id="nav-activity-icon" class="relative px-4 py-1 rounded-full">
+                    <span class="text-white text-xl">🔔</span>
+                    <div id="activity-badge" class="hidden absolute top-1 right-2 w-3 h-3 bg-[#25D366] rounded-full border-2 border-[#0B141A]"></div>
+                </div>
+                <span class="text-xs text-white">Alerts</span>
+            </div>
+            <div id="nav-settings" class="flex flex-col items-center gap-1 cursor-pointer opacity-60 w-20">
+                <div id="nav-settings-icon" class="relative px-4 py-1 rounded-full"><span class="text-white text-xl">⚙️</span></div>
+                <span class="text-xs text-white">Settings</span>
+            </div>
+        </nav>
     </div>
 
-    <!-- ACTIVITY SCREEN (NEW) -->
+    <!-- NOTIFICATIONS / ACTIVITY SCREEN -->
     <div id="activity-screen" class="hidden flex-col h-full w-full bg-[#0B141A] absolute top-0 left-0 z-30 pb-20">
         <header class="pt-6 pb-4 px-4 border-b border-[#202C33] flex items-center gap-4">
-            <h1 class="text-2xl font-bold text-white">Activity</h1>
+            <h1 class="text-2xl font-bold text-white">Alerts</h1>
         </header>
         <main class="flex-1 overflow-y-auto relative" id="activity-list">
             <div class="p-4 text-center text-gray-500 text-sm mt-10">No new notifications.</div>
         </main>
     </div>
 
-    <!-- GLOBAL BOTTOM NAVIGATION (UPDATED) -->
-    <nav class="bg-[#0B141A] border-t border-[#202C33] flex justify-around items-center px-2 py-2 pb-4 absolute bottom-0 w-full z-40">
-        <div id="nav-chats" class="flex flex-col items-center gap-1 cursor-pointer w-20">
-            <div id="nav-chats-icon" class="relative px-4 py-1 bg-[#0A332C] rounded-full"><span class="text-white text-xl">💬</span></div>
-            <span class="text-xs text-white font-medium">Chats</span>
-        </div>
-        <div id="nav-activity" class="flex flex-col items-center gap-1 cursor-pointer opacity-60 w-20">
-            <div id="nav-activity-icon" class="relative px-4 py-1 rounded-full">
-                <span class="text-white text-xl">❤️</span>
-                <!-- Red dot for new requests -->
-                <div id="activity-badge" class="hidden absolute top-1 right-2 w-3 h-3 bg-red-500 rounded-full border-2 border-[#0B141A]"></div>
-            </div>
-            <span class="text-xs text-white">Activity</span>
-        </div>
-        <div id="nav-settings" class="flex flex-col items-center gap-1 cursor-pointer opacity-60 w-20">
-            <div id="nav-settings-icon" class="relative px-4 py-1 rounded-full"><span class="text-white text-xl">⚙️</span></div>
-            <span class="text-xs text-white">Settings</span>
-        </div>
-    </nav>
+    <!-- LIST SCREEN (For showing Followers/Following) -->
+    <div id="connections-screen" class="hidden flex-col h-full w-full bg-[#0B141A] absolute top-0 left-0 z-50">
+        <header class="pt-6 pb-4 px-4 border-b border-[#202C33] flex items-center gap-4">
+            <span id="connections-back-btn" class="text-white text-2xl cursor-pointer px-2">←</span>
+            <h1 class="text-xl font-bold text-white" id="connections-header-title">List</h1>
+        </header>
+        <main class="flex-1 overflow-y-auto relative" id="connections-list-area"></main>
+    </div>
 
-    <!-- INSTA-STYLE PROFILE SCREEN (UPDATED) -->
+    <!-- INSTA-STYLE PROFILE SCREEN -->
     <div id="user-profile-screen" class="hidden flex-col h-full w-full bg-[#0B141A] absolute top-0 left-0 z-40 pb-20 overflow-y-auto">
         <header class="pt-6 pb-4 px-4 flex items-center gap-4">
             <span id="profile-back-btn" class="text-white text-2xl cursor-pointer px-2">←</span>
@@ -104,19 +111,17 @@
             <h2 id="profile-page-name" class="text-2xl font-bold text-white">Name</h2>
             <p id="profile-page-bio" class="text-sm text-gray-400 mt-1">Veyra User</p>
             
-            <!-- Follow Stats (Hides if Private & Not Following) -->
             <div id="profile-stats-container" class="flex gap-8 mt-6 w-full justify-center px-8">
-                <div class="flex flex-col items-center">
+                <div id="profile-followers-btn" class="flex flex-col items-center cursor-pointer">
                     <span id="profile-followers-count" class="text-xl font-bold text-white">-</span>
                     <span class="text-xs text-gray-400">Followers</span>
                 </div>
-                <div class="flex flex-col items-center">
+                <div id="profile-following-btn" class="flex flex-col items-center cursor-pointer">
                     <span id="profile-following-count" class="text-xl font-bold text-white">-</span>
                     <span class="text-xs text-gray-400">Following</span>
                 </div>
             </div>
 
-            <!-- Private Account Lock Warning -->
             <div id="profile-private-warning" class="hidden flex-col items-center mt-6 px-8 text-center">
                 <span class="text-4xl mb-2">🔒</span>
                 <h3 class="text-white font-bold">This Account is Private</h3>
@@ -130,24 +135,29 @@
         </div>
     </div>
 
-    <!-- SETTINGS SCREEN (UPDATED) -->
+    <!-- SETTINGS SCREEN -->
     <div id="settings-screen" class="hidden flex-col h-full w-full bg-[#0B141A] absolute top-0 left-0 z-30 pb-20 overflow-y-auto">
         <header class="pt-6 pb-4 px-4 border-b border-[#202C33] flex items-center gap-4">
+            <span id="settings-back-btn" class="text-white text-2xl cursor-pointer px-2">←</span>
             <h1 class="text-2xl font-bold text-white">Settings</h1>
         </header>
         
-        <div class="p-4 flex items-center gap-4 border-b border-[#202C33]">
-            <div id="settings-profile-pic" class="w-16 h-16 bg-gray-600 rounded-full bg-cover bg-center"></div>
-            <div>
-                <h2 id="settings-name" class="text-xl font-normal text-white">User</h2>
-                <p id="settings-username" class="text-sm text-[#25D366]">@username</p>
-                <p id="settings-stats" class="text-xs text-gray-400 mt-1">Followers: 0 | Following: 0</p>
+        <div class="p-4 flex flex-col border-b border-[#202C33]">
+            <div class="flex items-center gap-4">
+                <div id="settings-profile-pic" class="w-16 h-16 bg-gray-600 rounded-full bg-cover bg-center"></div>
+                <div>
+                    <h2 id="settings-name" class="text-xl font-normal text-white">User</h2>
+                    <p id="settings-username" class="text-sm text-[#25D366]">@username</p>
+                </div>
+            </div>
+            <div class="flex gap-6 mt-4 ml-20">
+                <div id="settings-followers-btn" class="cursor-pointer flex flex-col"><span id="set-followers" class="font-bold text-white">0</span><span class="text-xs text-gray-400">Followers</span></div>
+                <div id="settings-following-btn" class="cursor-pointer flex flex-col"><span id="set-following" class="font-bold text-white">0</span><span class="text-xs text-gray-400">Following</span></div>
             </div>
         </div>
 
         <div class="p-4 mt-2">
             <h3 class="text-[#25D366] text-sm font-semibold mb-4">PRIVACY & PROFILE</h3>
-            
             <div class="bg-[#111B21] rounded-xl p-4 shadow-sm mb-4">
                 <div class="flex justify-between items-center">
                     <div>
@@ -223,6 +233,7 @@
         let viewingProfileUser = null; 
         let isFollowingTarget = false;
         let hasRequestedTarget = false;
+        let previousScreen = 'main';
 
         const screens = {
             login: document.getElementById('login-screen'),
@@ -231,17 +242,21 @@
             activity: document.getElementById('activity-screen'),
             settings: document.getElementById('settings-screen'),
             profile: document.getElementById('user-profile-screen'),
+            connections: document.getElementById('connections-screen'),
             chat: document.getElementById('chat-room')
         };
         
         function showScreen(screenName) {
-            Object.values(screens).forEach(el => {
-                if(el) { el.classList.add('hidden'); el.classList.remove('flex'); }
+            Object.keys(screens).forEach(key => {
+                if(!screens[key].classList.contains('hidden') && key !== 'connections') {
+                    previousScreen = key; 
+                }
+                screens[key].classList.add('hidden'); 
+                screens[key].classList.remove('flex');
             });
             screens[screenName].classList.remove('hidden');
             screens[screenName].classList.add('flex');
             
-            // Bottom Nav UI Updates
             if(['main', 'activity', 'settings'].includes(screenName)) {
                 ['chats', 'activity', 'settings'].forEach(nav => {
                     document.getElementById(`nav-${nav}`).classList.add('opacity-60');
@@ -260,7 +275,6 @@
                     if (userDoc.exists() && userDoc.data().username) {
                         currentUserData = userDoc.data();
                         
-                        // Setup Settings
                         document.getElementById('settings-name').textContent = currentUserData.name;
                         document.getElementById('settings-username').textContent = "@" + currentUserData.username;
                         if(currentUserData.photoUrl) document.getElementById('settings-profile-pic').style.backgroundImage = `url('${currentUserData.photoUrl}')`;
@@ -269,20 +283,16 @@
                         showScreen('main');
                         loadInbox();
                         watchMyStats(); 
-                        loadActivityTab(); // NEW: Load Notifications
+                        loadActivityTab();
                     } else {
                         showScreen('username');
                     }
-                } catch (error) {
-                    console.error(error);
-                    showScreen('username'); 
-                }
+                } catch (error) { showScreen('username'); }
             } else {
                 showScreen('login');
             }
         });
 
-        // Toggle Private Account
         document.getElementById('private-account-toggle').addEventListener('change', async (e) => {
             const isPrivate = e.target.checked;
             await updateDoc(doc(db, "users", currentUser.uid), { isPrivate: isPrivate });
@@ -291,15 +301,14 @@
 
         function watchMyStats() {
             onSnapshot(collection(db, `users/${currentUser.uid}/followers`), (snap) => {
-                const followers = snap.size;
-                onSnapshot(collection(db, `users/${currentUser.uid}/following`), (snap2) => {
-                    const following = snap2.size;
-                    document.getElementById('settings-stats').textContent = `Followers: ${followers} | Following: ${following}`;
-                });
+                document.getElementById('set-followers').textContent = snap.size;
+            });
+            onSnapshot(collection(db, `users/${currentUser.uid}/following`), (snap) => {
+                document.getElementById('set-following').textContent = snap.size;
             });
         }
 
-        // LOAD ACTIVITY (Follow Requests)
+        // FULL NOTIFICATION ENGINE
         function loadActivityTab() {
             onSnapshot(collection(db, `users/${currentUser.uid}/activity`), (snapshot) => {
                 const list = document.getElementById('activity-list');
@@ -307,7 +316,7 @@
                 
                 if(snapshot.empty) {
                     badge.classList.add('hidden');
-                    list.innerHTML = `<div class="p-4 text-center text-gray-500 text-sm mt-10">No new notifications.</div>`;
+                    list.innerHTML = `<div class="p-4 text-center text-gray-500 text-sm mt-10">No new alerts.</div>`;
                     return;
                 }
                 
@@ -317,36 +326,97 @@
                 snapshot.forEach((docSnap) => {
                     const req = docSnap.data();
                     const reqId = docSnap.id;
-                    
                     const div = document.createElement('div');
-                    div.className = "flex items-center gap-3 p-4 border-b border-[#202C33]/50";
-                    div.innerHTML = `
-                        <div class="w-10 h-10 bg-gray-600 rounded-full flex-shrink-0" style="background-image: url('${req.photoUrl}'); background-size: cover;"></div>
-                        <div class="flex-1">
-                            <p class="text-sm text-white"><span class="font-bold">${req.username}</span> requested to follow you.</p>
-                        </div>
-                        <div class="flex gap-2">
-                            <button class="accept-btn bg-[#25D366] text-[#0B141A] font-bold px-3 py-1 rounded-lg text-xs">Confirm</button>
-                            <button class="decline-btn bg-[#202C33] text-white font-bold px-3 py-1 rounded-lg text-xs">Delete</button>
-                        </div>
-                    `;
+                    div.className = "flex items-center gap-3 p-4 border-b border-[#202C33]/50 cursor-pointer";
                     
-                    div.querySelector('.accept-btn').addEventListener('click', async () => {
-                        // Add to followers & following
-                        await setDoc(doc(db, `users/${currentUser.uid}/followers/${req.uid}`), { uid: req.uid, timestamp: serverTimestamp() });
-                        await setDoc(doc(db, `users/${req.uid}/following/${currentUser.uid}`), { uid: currentUser.uid, timestamp: serverTimestamp() });
-                        // Delete request
-                        await deleteDoc(doc(db, `users/${currentUser.uid}/activity/${reqId}`));
-                    });
-
-                    div.querySelector('.decline-btn').addEventListener('click', async () => {
-                        await deleteDoc(doc(db, `users/${currentUser.uid}/activity/${reqId}`));
-                    });
-
+                    if (req.type === 'follow_request') {
+                        div.innerHTML = `
+                            <div class="w-10 h-10 bg-gray-600 rounded-full flex-shrink-0" style="background-image: url('${req.photoUrl}'); background-size: cover;"></div>
+                            <div class="flex-1"><p class="text-sm text-white"><span class="font-bold">${req.username}</span> requested to follow you.</p></div>
+                            <div class="flex gap-2">
+                                <button class="accept-btn bg-[#25D366] text-[#0B141A] font-bold px-3 py-1 rounded-lg text-xs">Accept</button>
+                                <button class="decline-btn bg-[#202C33] text-white font-bold px-3 py-1 rounded-lg text-xs">Hide</button>
+                            </div>
+                        `;
+                        div.querySelector('.accept-btn').addEventListener('click', async (e) => {
+                            e.stopPropagation();
+                            await setDoc(doc(db, `users/${currentUser.uid}/followers/${req.uid}`), { uid: req.uid, timestamp: serverTimestamp() });
+                            await setDoc(doc(db, `users/${req.uid}/following/${currentUser.uid}`), { uid: currentUser.uid, timestamp: serverTimestamp() });
+                            await deleteDoc(doc(db, `users/${currentUser.uid}/activity/${reqId}`));
+                            
+                            // Send them an alert that you accepted
+                            await setDoc(doc(db, `users/${req.uid}/activity/${currentUser.uid}_accept`), {
+                                type: 'started_following', uid: currentUser.uid, username: currentUserData.username, photoUrl: currentUserData.photoUrl, timestamp: serverTimestamp()
+                            });
+                        });
+                        div.querySelector('.decline-btn').addEventListener('click', async (e) => {
+                            e.stopPropagation(); await deleteDoc(doc(db, `users/${currentUser.uid}/activity/${reqId}`));
+                        });
+                    } 
+                    else if (req.type === 'started_following') {
+                        div.innerHTML = `
+                            <div class="w-10 h-10 bg-gray-600 rounded-full flex-shrink-0" style="background-image: url('${req.photoUrl}'); background-size: cover;"></div>
+                            <div class="flex-1"><p class="text-sm text-white"><span class="font-bold">${req.username}</span> started following you.</p></div>
+                        `;
+                        div.addEventListener('click', async () => {
+                            await deleteDoc(doc(db, `users/${currentUser.uid}/activity/${reqId}`));
+                            const u = await getDoc(doc(db, "users", req.uid));
+                            if(u.exists()) openProfileScreen(u.data());
+                        });
+                    }
+                    else if (req.type === 'new_message') {
+                        div.innerHTML = `
+                            <div class="w-10 h-10 bg-gray-600 rounded-full flex-shrink-0" style="background-image: url('${req.photoUrl}'); background-size: cover;"></div>
+                            <div class="flex-1"><p class="text-sm text-white"><span class="font-bold">${req.username}</span> sent you a message.</p></div>
+                        `;
+                        div.addEventListener('click', async () => {
+                            await deleteDoc(doc(db, `users/${currentUser.uid}/activity/${reqId}`));
+                            const u = await getDoc(doc(db, "users", req.uid));
+                            if(u.exists()) openPrivateChat(u.data());
+                        });
+                    }
                     list.appendChild(div);
                 });
             });
         }
+
+        // LOAD CONNECTIONS LIST (Followers/Following UI)
+        async function openConnectionsList(targetUid, typeTitle) {
+            document.getElementById('connections-header-title').textContent = typeTitle;
+            showScreen('connections');
+            const listArea = document.getElementById('connections-list-area');
+            listArea.innerHTML = `<div class="p-4 text-center text-gray-500 text-sm">Loading...</div>`;
+            
+            const folder = typeTitle.toLowerCase();
+            const snap = await getDocs(collection(db, `users/${targetUid}/${folder}`));
+            
+            if(snap.empty) {
+                listArea.innerHTML = `<div class="p-4 text-center text-gray-500 text-sm">No ${folder} yet.</div>`;
+                return;
+            }
+
+            listArea.innerHTML = "";
+            snap.forEach(async (docSnap) => {
+                const uid = docSnap.id;
+                const userDoc = await getDoc(doc(db, "users", uid));
+                if(userDoc.exists()) {
+                    const u = userDoc.data();
+                    const div = document.createElement('div');
+                    div.className = "flex items-center gap-3 p-3 border-b border-[#202C33]/50 hover:bg-[#202C33] cursor-pointer";
+                    div.innerHTML = `
+                        <div class="w-10 h-10 bg-gray-600 rounded-full flex-shrink-0" style="background-image: url('${u.photoUrl}'); background-size: cover;"></div>
+                        <div><h4 class="text-white text-sm truncate">${u.name}</h4><p class="text-xs text-gray-400">@${u.username}</p></div>
+                    `;
+                    div.addEventListener('click', () => openProfileScreen(u));
+                    listArea.appendChild(div);
+                }
+            });
+        }
+
+        document.getElementById('connections-back-btn').addEventListener('click', () => showScreen(previousScreen));
+
+        document.getElementById('settings-followers-btn').addEventListener('click', () => openConnectionsList(currentUser.uid, 'Followers'));
+        document.getElementById('settings-following-btn').addEventListener('click', () => openConnectionsList(currentUser.uid, 'Following'));
 
         // Inbox Generator
         function loadInbox() {
@@ -377,9 +447,7 @@
                             </div>
                         </div>
                     `;
-                    div.querySelector('.avatar-btn').addEventListener('click', (e) => {
-                        e.stopPropagation(); openProfileScreen(chat);
-                    });
+                    div.querySelector('.avatar-btn').addEventListener('click', (e) => { e.stopPropagation(); openProfileScreen(chat); });
                     div.querySelector('.chat-btn').addEventListener('click', () => openPrivateChat(chat));
                     list.appendChild(div);
                 });
@@ -427,9 +495,7 @@
                     </div>
                 `;
                 div.addEventListener('click', () => {
-                    searchInput.value = "";
-                    searchResults.classList.add('hidden');
-                    openProfileScreen(userObj);
+                    searchInput.value = ""; searchResults.classList.add('hidden'); openProfileScreen(userObj);
                 });
                 searchResults.appendChild(div);
             });
@@ -437,18 +503,14 @@
             searchResults.classList.remove('hidden');
         });
 
-        document.addEventListener('click', (e) => {
-            if(e.target !== searchInput) searchResults.classList.add('hidden');
-        });
+        document.addEventListener('click', (e) => { if(e.target !== searchInput) searchResults.classList.add('hidden'); });
 
         // PROFILE ENGINE
         async function openProfileScreen(targetUser) {
             viewingProfileUser = targetUser;
-            
             document.getElementById('profile-header-username').textContent = "@" + targetUser.username;
             document.getElementById('profile-page-name').textContent = targetUser.name;
             if(targetUser.photoUrl) document.getElementById('profile-page-pic').style.backgroundImage = `url('${targetUser.photoUrl}')`;
-            
             showScreen('profile');
 
             const statsContainer = document.getElementById('profile-stats-container');
@@ -456,43 +518,43 @@
             const msgBtn = document.getElementById('profile-message-btn');
             const followBtn = document.getElementById('profile-follow-btn');
 
-            // Listen to Followers
             onSnapshot(collection(db, `users/${targetUser.uid}/followers`), async (snap) => {
                 document.getElementById('profile-followers-count').textContent = snap.size;
-                
                 isFollowingTarget = false;
                 snap.forEach(doc => { if(doc.id === currentUser.uid) isFollowingTarget = true; });
 
-                // Check for pending request
                 const reqDoc = await getDoc(doc(db, `users/${targetUser.uid}/activity/${currentUser.uid}`));
                 hasRequestedTarget = reqDoc.exists();
 
-                // Profile Locking Logic
+                // Profile Lock Check
                 if (targetUser.isPrivate && !isFollowingTarget) {
-                    statsContainer.classList.add('hidden');
+                    // Locked
+                    document.getElementById('profile-followers-count').textContent = "-";
+                    document.getElementById('profile-following-count').textContent = "-";
+                    document.getElementById('profile-followers-btn').onclick = null;
+                    document.getElementById('profile-following-btn').onclick = null;
+                    
                     privateWarning.classList.remove('hidden');
                     msgBtn.classList.add('hidden');
                 } else {
-                    statsContainer.classList.remove('hidden');
+                    // Unlocked - Enable Clickable Lists
                     privateWarning.classList.add('hidden');
                     msgBtn.classList.remove('hidden');
+                    document.getElementById('profile-followers-btn').onclick = () => openConnectionsList(targetUser.uid, 'Followers');
+                    document.getElementById('profile-following-btn').onclick = () => openConnectionsList(targetUser.uid, 'Following');
                 }
                 
-                // Button State Logic
                 if (isFollowingTarget) {
-                    followBtn.textContent = "Following";
-                    followBtn.className = "flex-1 bg-[#202C33] text-white font-bold py-2 rounded-lg transition-colors";
+                    followBtn.textContent = "Following"; followBtn.className = "flex-1 bg-[#202C33] text-white font-bold py-2 rounded-lg transition-colors";
                 } else if (hasRequestedTarget) {
-                    followBtn.textContent = "Requested";
-                    followBtn.className = "flex-1 bg-[#202C33] text-white font-bold py-2 rounded-lg transition-colors opacity-70";
+                    followBtn.textContent = "Requested"; followBtn.className = "flex-1 bg-[#202C33] text-white font-bold py-2 rounded-lg transition-colors opacity-70";
                 } else {
-                    followBtn.textContent = "Follow";
-                    followBtn.className = "flex-1 bg-[#25D366] text-[#0B141A] font-bold py-2 rounded-lg transition-colors";
+                    followBtn.textContent = "Follow"; followBtn.className = "flex-1 bg-[#25D366] text-[#0B141A] font-bold py-2 rounded-lg transition-colors";
                 }
             });
 
             onSnapshot(collection(db, `users/${targetUser.uid}/following`), (snap) => {
-                document.getElementById('profile-following-count').textContent = snap.size;
+                if(!targetUser.isPrivate || isFollowingTarget) document.getElementById('profile-following-count').textContent = snap.size;
             });
         }
 
@@ -502,27 +564,26 @@
             const targetId = viewingProfileUser.uid;
             
             if (isFollowingTarget) {
-                // UNFOLLOW
                 await deleteDoc(doc(db, `users/${targetId}/followers/${currentUser.uid}`));
                 await deleteDoc(doc(db, `users/${currentUser.uid}/following/${targetId}`));
             } else if (hasRequestedTarget) {
-                // CANCEL REQUEST
                 await deleteDoc(doc(db, `users/${targetId}/activity/${currentUser.uid}`));
                 hasRequestedTarget = false;
             } else {
                 if (viewingProfileUser.isPrivate) {
-                    // SEND REQUEST
                     await setDoc(doc(db, `users/${targetId}/activity/${currentUser.uid}`), {
-                        type: 'follow_request',
-                        uid: currentUser.uid, username: currentUserData.username,
-                        name: currentUserData.name, photoUrl: currentUserData.photoUrl,
-                        timestamp: serverTimestamp()
+                        type: 'follow_request', uid: currentUser.uid, username: currentUserData.username,
+                        name: currentUserData.name, photoUrl: currentUserData.photoUrl, timestamp: serverTimestamp()
                     });
                     hasRequestedTarget = true;
                 } else {
-                    // INSTANT FOLLOW
                     await setDoc(doc(db, `users/${targetId}/followers/${currentUser.uid}`), { uid: currentUser.uid, timestamp: serverTimestamp() });
                     await setDoc(doc(db, `users/${currentUser.uid}/following/${targetId}`), { uid: targetId, timestamp: serverTimestamp() });
+                    
+                    // Alert them of instant follow
+                    await setDoc(doc(db, `users/${targetId}/activity/${currentUser.uid}_follow`), {
+                        type: 'started_following', uid: currentUser.uid, username: currentUserData.username, photoUrl: currentUserData.photoUrl, timestamp: serverTimestamp()
+                    });
                 }
             }
         });
@@ -541,19 +602,15 @@
             if(otherUser.photoUrl) document.getElementById('chat-header-pic').style.backgroundImage = `url('${otherUser.photoUrl}')`;
 
             setDoc(doc(db, `users/${currentUser.uid}/inbox/${otherUser.uid}`), { isRead: true }, {merge: true}).catch(e=>{});
-
             showScreen('chat');
             loadPrivateMessages();
         }
 
         document.getElementById('chat-header-pic').addEventListener('click', () => openProfileScreen(currentActiveChatUser));
         document.getElementById('chat-header-info').addEventListener('click', () => openProfileScreen(currentActiveChatUser));
-
         document.getElementById('back-btn').addEventListener('click', () => {
             if(currentChatListener) currentChatListener();
-            activeChatId = null;
-            currentActiveChatUser = null;
-            showScreen('main');
+            activeChatId = null; currentActiveChatUser = null; showScreen('main');
         });
 
         document.getElementById('send-btn').addEventListener('click', async () => {
@@ -577,6 +634,12 @@
                     uid: currentUser.uid, name: currentUserData.name, username: currentUserData.username,
                     photoUrl: currentUserData.photoUrl, lastMessage: text, lastSenderId: currentUser.uid, isRead: false, timestamp: serverTimestamp()
                 }, {merge: true});
+                
+                // NEW: Send Message Notification Alert
+                await setDoc(doc(db, `users/${currentActiveChatUser.uid}/activity/${currentUser.uid}_msg`), {
+                    type: 'new_message', uid: currentUser.uid, username: currentUserData.username, photoUrl: currentUserData.photoUrl, timestamp: serverTimestamp()
+                });
+
             } catch(e) { alert("Message failed."); }
         });
 
@@ -601,13 +664,10 @@
                         updateDoc(msgRef, { isRead: true }).catch(e=>{});
                         if (msg.timer === "view-once") setTimeout(() => { deleteDoc(msgRef).catch(e=>{}); }, 10000); 
                     }
-
                     if (msg.timer === "7-hours" || msg.timer === "24-hours") {
                         const hours = msg.timer === "7-hours" ? 7 : 24;
                         const msgTime = msg.timestamp ? msg.timestamp.toMillis() : Date.now();
-                        if (Date.now() - msgTime > hours * 60 * 60 * 1000) {
-                            deleteDoc(msgRef).catch(e=>{}); return; 
-                        }
+                        if (Date.now() - msgTime > hours * 60 * 60 * 1000) { deleteDoc(msgRef).catch(e=>{}); return; }
                     }
 
                     const timerIcon = msg.timer && msg.timer !== "off" ? "⏱️" : "";
@@ -615,9 +675,7 @@
                     const ticksHtml = isMe ? `<span class="${tickColor} font-bold text-xs tracking-tighter">✓✓</span>` : '';
 
                     const div = document.createElement('div');
-                    div.className = isMe 
-                        ? "self-end max-w-[80%] bg-[#005C4B] text-white rounded-lg p-2 rounded-tr-none shadow" 
-                        : "self-start max-w-[80%] bg-[#202C33] text-white rounded-lg p-2 rounded-tl-none shadow";
+                    div.className = isMe ? "self-end max-w-[80%] bg-[#005C4B] text-white rounded-lg p-2 rounded-tr-none shadow" : "self-start max-w-[80%] bg-[#202C33] text-white rounded-lg p-2 rounded-tl-none shadow";
                     div.innerHTML = `<p class="text-sm">${msg.text}</p><div class="flex justify-end mt-1 text-[10px] items-center gap-1"><span>${timerIcon}</span>${ticksHtml}</div>`;
                     messagesArea.appendChild(div);
                 });
@@ -625,10 +683,10 @@
             });
         }
 
-        // Nav Mapping
         document.getElementById('nav-settings').addEventListener('click', () => showScreen('settings'));
         document.getElementById('nav-activity').addEventListener('click', () => showScreen('activity'));
         document.getElementById('nav-chats').addEventListener('click', () => showScreen('main'));
+        document.getElementById('settings-back-btn').addEventListener('click', () => showScreen('main'));
         document.getElementById('main-menu-btn').addEventListener('click', () => showScreen('settings'));
         
     </script>
