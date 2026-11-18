@@ -12,24 +12,28 @@
         body { -webkit-tap-highlight-color: transparent; }
         audio { height: 35px; outline: none; }
         audio::-webkit-media-controls-panel { background-color: #E9EDEF; }
-        .custom-scrollbar::-webkit-scrollbar { display: block; height: 3px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #2A3942; border-radius: 10px; }
     </style>
 </head>
 <body class="bg-[#0B141A] text-[#E9EDEF] font-sans h-[100dvh] flex flex-col overflow-hidden relative">
 
     <audio id="ringtone-audio" src="https://assets.mixkit.co/active_storage/sfx/2870/2870-preview.mp3" loop preload="auto"></audio>
 
-    <!-- INCOMING CALL SCREEN -->
-    <div id="incoming-call-screen" class="hidden flex-col items-center justify-between h-full w-full bg-[#0B141A]/95 backdrop-blur-md absolute top-0 left-0 z-[70] pb-12 pt-20">
-        <h2 class="text-[#25D366] text-xl font-bold tracking-widest drop-shadow-lg">VEYRA VIDEO CALL</h2>
-        <div class="flex flex-col items-center gap-6 mt-10">
-            <div id="ring-caller-pic" class="w-32 h-32 rounded-full bg-gray-600 bg-cover bg-center border-4 border-[#25D366] animate-pulse"></div>
+    <!-- INCOMING CALL SCREEN WITH VEYRA LOGO -->
+    <div id="incoming-call-screen" class="hidden flex-col items-center justify-between h-full w-full bg-[#0B141A]/95 backdrop-blur-md absolute top-0 left-0 z-[70] pb-12 pt-16">
+        <div class="flex flex-col items-center gap-2">
+            <div class="w-10 h-10 bg-gradient-to-tr from-[#25D366] to-[#00A884] rounded-xl flex items-center justify-center shadow-lg shadow-[#25D366]/20">
+                <span class="text-white font-black text-2xl">V</span>
+            </div>
+            <h2 class="text-[#25D366] text-lg font-bold tracking-widest drop-shadow-lg">VEYRA VIDEO CALL</h2>
+        </div>
+        
+        <div class="flex flex-col items-center gap-6 mt-6">
+            <div id="ring-caller-pic" class="w-32 h-32 rounded-full bg-gray-600 bg-cover bg-center border-4 border-[#25D366] animate-pulse shadow-[0_0_30px_rgba(37,211,102,0.4)]"></div>
             <h3 id="ring-caller-name" class="text-3xl text-white font-bold drop-shadow-md">Name</h3>
             <p class="text-gray-400">Incoming video call...</p>
         </div>
         <div class="flex gap-16 w-full justify-center mt-10">
-            <div id="decline-call-btn" class="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center cursor-pointer shadow-lg shadow-red-600/30">
+            <div id="decline-call-btn" class="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center cursor-pointer shadow-lg shadow-red-600/30 hover:scale-105 transition-transform">
                 <span class="text-white text-3xl transform rotate-[135deg]">📞</span>
             </div>
             <div id="accept-call-btn" class="w-16 h-16 bg-[#25D366] rounded-full flex items-center justify-center cursor-pointer shadow-lg shadow-[#25D366]/30 animate-bounce">
@@ -105,11 +109,6 @@
             <div id="search-results" class="hidden absolute top-14 left-4 right-4 bg-[#202C33] rounded-xl shadow-xl p-2 flex-col gap-1 max-h-60 overflow-y-auto"></div>
         </div>
 
-        <div id="stories-wrapper" class="px-4 pt-4 pb-3 border-b border-[#202C33] bg-[#0B141A]">
-            <div id="stories-list" class="flex gap-4 overflow-x-auto items-center pb-2 custom-scrollbar"></div>
-            <input type="file" id="story-media-input" accept="image/*" class="hidden">
-        </div>
-
         <main class="flex-1 overflow-y-auto relative pb-24" id="recent-chats-list">
             <div class="p-4 text-center text-gray-500 text-sm mt-10">Search a username above to connect with people!</div>
         </main>
@@ -160,7 +159,7 @@
         </header>
         
         <div class="flex flex-col items-center pt-4 pb-6 border-b border-[#202C33]">
-            <div id="profile-page-pic" class="w-24 h-24 bg-gray-600 rounded-full bg-cover bg-center mb-4"></div>
+            <div id="profile-page-pic" class="w-24 h-24 bg-gray-600 rounded-full bg-cover bg-center mb-4 border-2 border-[#202C33]"></div>
             <h2 id="profile-page-name" class="text-2xl font-bold text-white">Name</h2>
             <p id="profile-page-bio" class="text-sm text-gray-400 mt-1">VEYRA User</p>
             
@@ -197,7 +196,7 @@
         
         <div class="p-4 flex flex-col border-b border-[#202C33]">
             <div class="flex items-center gap-4">
-                <div id="settings-profile-pic" class="w-16 h-16 bg-gray-600 rounded-full bg-cover bg-center"></div>
+                <div id="settings-profile-pic" class="w-16 h-16 bg-gray-600 rounded-full bg-cover bg-center border-2 border-[#202C33]"></div>
                 <div>
                     <h2 id="settings-name" class="text-xl font-normal text-white">User</h2>
                     <p id="settings-username" class="text-sm text-[#25D366]">@username</p>
@@ -243,11 +242,12 @@
         <div class="p-4 pt-0"><button id="logout-btn" class="w-full bg-[#202C33] text-gray-400 font-bold py-3 rounded-xl cursor-pointer hover:bg-[#2A3942] transition-colors">Log Out</button></div>
     </div>
 
-    <!-- PRIVATE CHAT ROOM UI -->
+    <!-- PRIVATE CHAT ROOM UI (CRISP WHITE THEME WITH HOLOGRAM) -->
     <div id="chat-room" class="hidden flex-col h-full w-full bg-[#EFEAE2] absolute top-0 left-0 z-50">
+        
         <header class="pt-4 pb-2 px-4 flex items-center gap-4 bg-[#202C33] shadow-md z-20">
             <span id="back-btn" class="text-white text-2xl cursor-pointer px-2">←</span>
-            <div class="w-10 h-10 bg-gray-600 rounded-full flex-shrink-0 cursor-pointer" id="chat-header-pic" style="background-size: cover;"></div>
+            <div class="w-10 h-10 bg-gray-600 rounded-full flex-shrink-0 cursor-pointer border border-[#2A3942]" id="chat-header-pic" style="background-size: cover;"></div>
             <div class="flex-1 cursor-pointer" id="chat-header-info">
                 <h2 class="text-lg font-medium text-white" id="chat-header-name">Name</h2>
                 <span class="text-xs text-gray-400 font-medium" id="chat-header-status">@username</span>
@@ -258,9 +258,11 @@
         </header>
         
         <main class="flex-1 relative flex flex-col overflow-hidden bg-[#EFEAE2]">
+            <!-- VEYRA WATERMARK HOLOGRAM -->
             <div class="absolute inset-0 flex items-center justify-center pointer-events-none z-0 overflow-hidden">
                 <span class="text-6xl sm:text-8xl font-black text-black opacity-[0.04] select-none -rotate-12 tracking-[0.2em]">VEYRA</span>
             </div>
+
             <div id="messages-area" class="flex-1 overflow-y-auto p-4 flex flex-col gap-3 z-10 w-full"></div>
         </main>
         
@@ -272,7 +274,7 @@
             
             <input type="text" id="message-input" autocomplete="off" spellcheck="false" placeholder="Message" class="flex-1 bg-[#2A3942] text-white rounded-full px-4 py-2 outline-none text-sm">
             
-            <div id="send-btn" class="hidden w-10 h-10 bg-[#25D366] rounded-full flex items-center justify-center cursor-pointer flex-shrink-0">
+            <div id="send-btn" class="hidden w-10 h-10 bg-[#25D366] rounded-full flex items-center justify-center cursor-pointer flex-shrink-0 hover:bg-[#1DA851] transition-colors">
                 <span class="text-[#0B141A] font-bold">➤</span>
             </div>
             
@@ -280,19 +282,6 @@
                 <span class="text-white text-xl">🎤</span>
             </div>
         </footer>
-    </div>
-
-    <!-- FULL SCREEN STORY VIEWER -->
-    <div id="story-viewer-screen" class="hidden flex-col h-full w-full bg-black absolute top-0 left-0 z-[60]">
-        <header class="pt-6 pb-4 px-4 flex items-center gap-4 absolute top-4 w-full z-10 bg-gradient-to-b from-black/80 to-transparent">
-            <span id="close-story-btn" class="text-white text-3xl cursor-pointer px-2 drop-shadow-md">←</span>
-            <div class="w-10 h-10 bg-gray-600 rounded-full flex-shrink-0 border border-white" id="story-viewer-pic" style="background-size: cover;"></div>
-            <div class="flex flex-col">
-                <h2 class="text-lg font-bold text-white drop-shadow-md" id="story-viewer-name">Name</h2>
-                <span class="text-xs text-gray-300 drop-shadow-md" id="story-viewer-time">Just now</span>
-            </div>
-        </header>
-        <div id="story-image-container" class="w-full h-full bg-contain bg-no-repeat bg-center" style="background-image: url('');"></div>
     </div>
 
     <script type="module">
@@ -510,7 +499,7 @@
             document.getElementById('settings-name').textContent = currentUserData.name || "User"; document.getElementById('settings-username').textContent = "@" + currentUserData.username;
             if(currentUserData.photoUrl) document.getElementById('settings-profile-pic').style.backgroundImage = `url('${currentUserData.photoUrl}')`;
             document.getElementById('private-account-toggle').checked = currentUserData.isPrivate === true;
-            showScreen('main'); loadInbox(); watchMyStats(); loadStoriesEngine(); listenForCalls(); loadActivityTab();
+            showScreen('main'); loadInbox(); watchMyStats(); listenForCalls(); loadActivityTab();
         }
 
         document.getElementById('save-username-btn').addEventListener('click', async () => {
@@ -540,11 +529,8 @@
             const confirmDelete = confirm("Are you sure you want to permanently delete your VEYRA ID? This cannot be undone.");
             if(confirmDelete) {
                 try {
-                    // Wipe database record completely
                     await deleteDoc(doc(db, "users", currentUser.uid));
-                    // Delete Auth User
                     await deleteUser(currentUser);
-                    // Clear Local Storage
                     localStorage.clear();
                     alert("Your VEYRA account has been permanently deleted.");
                     window.location.reload();
@@ -555,84 +541,7 @@
         });
 
         // ==========================================
-        // MUTUAL FOLLOWERS 24-HOUR STORIES ENGINE 
-        // ==========================================
-        let storyTimeoutObj;
-        async function loadStoriesEngine() {
-            const myFollowersSnap = await getDocs(collection(db, `users/${currentUser.uid}/followers`));
-            const myFollowingSnap = await getDocs(collection(db, `users/${currentUser.uid}/following`));
-            const followersList = new Set(); const mutuals = new Set();
-            myFollowersSnap.forEach(d => followersList.add(d.id));
-            myFollowingSnap.forEach(d => { if(followersList.has(d.id)) mutuals.add(d.id); });
-
-            onSnapshot(collection(db, 'stories'), (snapshot) => {
-                const storiesList = document.getElementById('stories-list'); storiesList.innerHTML = '';
-                let myActiveItems = []; let myStoryData = null; const now = Date.now(); const otherStories = [];
-
-                snapshot.forEach(docSnap => {
-                    const data = docSnap.data();
-                    const activeItems = data.items ? data.items.filter(s => now - s.timestamp < 24 * 60 * 60 * 1000) : [];
-                    if(data.uid === currentUser.uid) { 
-                        myActiveItems = activeItems; myStoryData = data; 
-                    } else if (mutuals.has(data.uid) && activeItems.length > 0) { 
-                        otherStories.push({ data, activeItems }); 
-                    }
-                });
-
-                const myDiv = document.createElement('div'); myDiv.className = "flex flex-col items-center gap-1 cursor-pointer flex-shrink-0 relative";
-                if(myActiveItems.length > 0) {
-                    myDiv.innerHTML = `<div class="w-14 h-14 rounded-full border-2 border-[#00A884] p-[2px] flex items-center justify-center"><div class="w-full h-full rounded-full bg-gray-600 bg-cover bg-center" style="background-image: url('${currentUserData.photoUrl || ''}')"></div></div><span class="text-xs text-white max-w-[60px] truncate">My Status</span>`;
-                    myDiv.onclick = () => viewStoryOverlay(myStoryData, myActiveItems);
-                } else {
-                    myDiv.innerHTML = `<div class="w-14 h-14 rounded-full border-2 border-dashed border-gray-500 flex items-center justify-center relative bg-[#202C33]"><div class="w-full h-full rounded-full bg-cover bg-center absolute top-0 left-0 opacity-40" style="background-image: url('${currentUserData.photoUrl || ''}')"></div><span class="text-[#25D366] text-2xl font-bold z-10 relative">+</span></div><span class="text-xs text-gray-400 max-w-[60px] truncate">Add Status</span>`;
-                    myDiv.onclick = () => document.getElementById('story-media-input').click();
-                }
-                storiesList.appendChild(myDiv);
-
-                otherStories.forEach(story => {
-                    const div = document.createElement('div'); div.className = "flex flex-col items-center gap-1 cursor-pointer flex-shrink-0";
-                    div.innerHTML = `<div class="w-14 h-14 rounded-full border-2 border-[#00A884] p-[2px] flex items-center justify-center"><div class="w-full h-full rounded-full bg-gray-600 bg-cover bg-center" style="background-image: url('${story.data.photoUrl || ''}')"></div></div><span class="text-xs text-white max-w-[60px] truncate">${story.data.name || story.data.username}</span>`;
-                    div.onclick = () => viewStoryOverlay(story.data, story.activeItems); storiesList.appendChild(div);
-                });
-            });
-        }
-
-        document.getElementById('story-media-input').addEventListener('change', async (e) => {
-            const file = e.target.files[0]; if(!file) return; e.target.value = ""; alert("Uploading story to your VEYRA network... Please wait a few seconds.");
-            try {
-                const formData = new FormData(); formData.append("image", file);
-                const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method: "POST", body: formData });
-                const data = await response.json();
-                if(data.success) {
-                    const downloadURL = data.data.url; const docRef = doc(db, 'stories', currentUser.uid); const docSnap = await getDoc(docRef);
-                    let userStories = []; const now = Date.now();
-                    if(docSnap.exists() && docSnap.data().items) { userStories = docSnap.data().items.filter(s => now - s.timestamp < 24 * 60 * 60 * 1000); }
-                    userStories.push({ url: downloadURL, timestamp: now });
-                    await setDoc(docRef, { uid: currentUser.uid, username: currentUserData.username, name: currentUserData.name || "User", photoUrl: currentUserData.photoUrl || "", items: userStories, lastUpdated: serverTimestamp() });
-                    alert("Story successfully posted! It will disappear in 24 hours.");
-                } else { alert("Story upload failed."); }
-            } catch(error) { alert("Upload error."); }
-        });
-
-        function viewStoryOverlay(userObj, items) {
-            const screen = document.getElementById('story-viewer-screen'); screen.classList.remove('hidden'); screen.classList.add('flex');
-            document.getElementById('story-viewer-pic').style.backgroundImage = `url('${userObj.photoUrl || ''}')`; document.getElementById('story-viewer-name').textContent = userObj.name || userObj.username;
-            let currentIndex = 0;
-            function showNextItem() {
-                if(currentIndex >= items.length) { closeStoryScreen(); return; }
-                document.getElementById('story-image-container').style.backgroundImage = `url('${items[currentIndex].url}')`;
-                const hoursAgo = Math.floor((Date.now() - items[currentIndex].timestamp) / (1000 * 60 * 60)); const minsAgo = Math.floor((Date.now() - items[currentIndex].timestamp) / (1000 * 60));
-                document.getElementById('story-viewer-time').textContent = hoursAgo > 0 ? `${hoursAgo}h ago` : (minsAgo > 0 ? `${minsAgo}m ago` : `Just now`);
-                clearTimeout(storyTimeoutObj); storyTimeoutObj = setTimeout(() => { currentIndex++; showNextItem(); }, 5000); 
-            }
-            showNextItem();
-        }
-
-        function closeStoryScreen() { clearTimeout(storyTimeoutObj); document.getElementById('story-viewer-screen').classList.add('hidden'); document.getElementById('story-viewer-screen').classList.remove('flex'); }
-        document.getElementById('close-story-btn').addEventListener('click', closeStoryScreen);
-
-        // ==========================================
-        // BUG FIX: PRIVATE ACCOUNT FOLLOW REQUESTS 
+        // UNTOUCHED CHAT & NOTIFICATION LOGIC
         // ==========================================
         function loadActivityTab() {
             onSnapshot(collection(db, `users/${currentUser.uid}/activity`), (snapshot) => {
@@ -686,7 +595,7 @@
                 snapshot.forEach((docSnap) => {
                     const chat = docSnap.data(); const unreadBadge = (!chat.isRead && chat.lastSenderId !== currentUser.uid) ? `<div class="w-3 h-3 bg-[#25D366] rounded-full shadow-lg"></div>` : '';
                     const div = document.createElement('div'); div.className = "flex items-center gap-4 px-4 py-3 hover:bg-[#202C33] cursor-pointer border-b border-[#202C33]/50";
-                    div.innerHTML = `<div class="w-12 h-12 bg-gray-600 rounded-full flex-shrink-0 avatar-btn" style="background-image: url('${chat.photoUrl || ''}'); background-size: cover;"></div><div class="flex-1 flex flex-col justify-center overflow-hidden chat-btn"><div class="flex justify-between items-center"><h2 class="text-lg font-normal text-white truncate">${chat.name || "User"}</h2>${unreadBadge}</div><div class="flex justify-between items-center"><p class="text-sm ${unreadBadge ? 'text-white font-medium' : 'text-gray-400'} truncate">${chat.lastMessage || ('@' + chat.username)}</p></div></div>`;
+                    div.innerHTML = `<div class="w-12 h-12 bg-gray-600 rounded-full flex-shrink-0 avatar-btn border border-[#202C33]" style="background-image: url('${chat.photoUrl || ''}'); background-size: cover;"></div><div class="flex-1 flex flex-col justify-center overflow-hidden chat-btn"><div class="flex justify-between items-center"><h2 class="text-lg font-normal text-white truncate">${chat.name || "User"}</h2>${unreadBadge}</div><div class="flex justify-between items-center"><p class="text-sm ${unreadBadge ? 'text-white font-medium' : 'text-gray-400'} truncate">${chat.lastMessage || ('@' + chat.username)}</p></div></div>`;
                     div.querySelector('.avatar-btn').addEventListener('click', (e) => { e.stopPropagation(); openProfileScreen(chat); });
                     div.querySelector('.chat-btn').addEventListener('click', () => { localStorage.setItem('veyra_active_user', JSON.stringify(chat)); openPrivateChat(chat); }); 
                     list.appendChild(div);
@@ -704,7 +613,7 @@
             querySnapshot.forEach((docSnap) => {
                 const userObj = docSnap.data(); if(userObj.uid === currentUser.uid) return; found = true;
                 const div = document.createElement('div'); div.className = "flex items-center gap-3 p-2 hover:bg-[#2A3942] rounded-lg cursor-pointer";
-                div.innerHTML = `<div class="w-10 h-10 bg-gray-600 rounded-full flex-shrink-0" style="background-image: url('${userObj.photoUrl || ''}'); background-size: cover;"></div><div><h4 class="text-white text-sm truncate">${userObj.name || "User"}</h4><p class="text-xs text-gray-400">@${userObj.username} ${userObj.isPrivate ? '🔒' : ''}</p></div>`;
+                div.innerHTML = `<div class="w-10 h-10 bg-gray-600 rounded-full flex-shrink-0 border border-[#202C33]" style="background-image: url('${userObj.photoUrl || ''}'); background-size: cover;"></div><div><h4 class="text-white text-sm truncate">${userObj.name || "User"}</h4><p class="text-xs text-gray-400">@${userObj.username} ${userObj.isPrivate ? '🔒' : ''}</p></div>`;
                 div.addEventListener('click', () => { searchInput.value = ""; searchResults.classList.add('hidden'); openProfileScreen(userObj); }); searchResults.appendChild(div);
             });
             if(!found) searchResults.innerHTML = `<div class="p-2 text-gray-400 text-sm">No users found</div>`; searchResults.classList.remove('hidden');
@@ -736,21 +645,18 @@
         document.getElementById('profile-follow-btn').addEventListener('click', async () => {
             if(!viewingProfileUser) return; const targetId = viewingProfileUser.uid;
             
-            // BUG FIX: Actually push the follow request to the target user's activity tab
             if (isFollowingTarget) { 
                 await deleteDoc(doc(db, `users/${targetId}/followers/${currentUser.uid}`)); await deleteDoc(doc(db, `users/${currentUser.uid}/following/${targetId}`)); 
             } else if (hasRequestedTarget) { 
                 await deleteDoc(doc(db, `users/${targetId}/activity/${currentUser.uid}`)); hasRequestedTarget = false; 
             } else {
                 if (viewingProfileUser.isPrivate) { 
-                    // Send Private Request
                     await setDoc(doc(db, `users/${targetId}/activity/${currentUser.uid}`), { 
                         type: 'follow_request', uid: currentUser.uid, username: currentUserData.username, 
                         name: currentUserData.name || "User", photoUrl: currentUserData.photoUrl || "", timestamp: serverTimestamp() 
                     }).catch(()=>{}); 
                     hasRequestedTarget = true; 
                 } else { 
-                    // Auto-Follow Public Account
                     await setDoc(doc(db, `users/${targetId}/followers/${currentUser.uid}`), { uid: currentUser.uid, timestamp: serverTimestamp() }).catch(()=>{}); 
                     await setDoc(doc(db, `users/${currentUser.uid}/following/${targetId}`), { uid: targetId, timestamp: serverTimestamp() }).catch(()=>{}); 
                     await setDoc(doc(db, `users/${targetId}/activity/${currentUser.uid}_follow`), { type: 'started_following', uid: currentUser.uid, username: currentUserData.username, photoUrl: currentUserData.photoUrl || "", timestamp: serverTimestamp() }).catch(()=>{}); 
