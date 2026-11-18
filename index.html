@@ -18,7 +18,6 @@
 </head>
 <body class="bg-[#0B141A] text-[#E9EDEF] font-sans h-[100dvh] flex flex-col overflow-hidden relative">
 
-    <!-- AUDIO FOR INCOMING RINGTONE -->
     <audio id="ringtone-audio" src="https://assets.mixkit.co/active_storage/sfx/2870/2870-preview.mp3" loop preload="auto"></audio>
 
     <!-- INCOMING CALL SCREEN -->
@@ -303,7 +302,6 @@
         let currentUser = null; let currentUserData = null;
         let activeChatId = null; let currentActiveChatUser = null; 
         
-        // Safe check for local storage
         try {
             if(localStorage.getItem('veyra_active_user')) {
                 currentActiveChatUser = JSON.parse(localStorage.getItem('veyra_active_user'));
@@ -346,7 +344,7 @@
         setInterval(setOnlineStatus, 45000); 
 
         // ==========================================
-        // WEBRTC CALLING ENGINE - WITH BULLETPROOF CAMERA KILL SWITCH
+        // WEBRTC CALLING ENGINE - BUG FIXES APPLIED
         // ==========================================
         let pc; let localStream; let remoteStream; let currentCallDocId = null; 
         let callUnsub = null; let callerIceUnsub = null; let calleeIceUnsub = null;
@@ -359,7 +357,11 @@
             document.getElementById('call-connecting-banner').classList.remove('hidden');
 
             try {
-                localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+                // BUG FIX: Mobile-optimized constraints
+                localStream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { facingMode: "user" }, 
+                    audio: { echoCancellation: true } 
+                });
                 document.getElementById('local-video').srcObject = localStream;
                 
                 pc = new RTCPeerConnection(pcConfig);
@@ -398,7 +400,9 @@
                     });
                 });
             } catch(e) {
-                alert("Could not access camera/microphone.");
+                // BUG FIX: Exposed true error message
+                console.error("Call Setup Error:", e);
+                alert("Connection Error: " + (e.message || "Network timeout"));
                 endCall();
             }
         });
@@ -434,7 +438,11 @@
             deleteDoc(doc(db, `users/${currentUser.uid}/incoming_call`)).catch(()=>{});
 
             try {
-                localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+                // BUG FIX: Mobile-optimized constraints
+                localStream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { facingMode: "user" }, 
+                    audio: { echoCancellation: true } 
+                });
                 document.getElementById('local-video').srcObject = localStream;
                 
                 pc = new RTCPeerConnection(pcConfig);
@@ -467,7 +475,9 @@
                     if(!snapshot.exists()) endCall();
                 });
             } catch(e) {
-                alert("Could not access camera/microphone.");
+                // BUG FIX: Exposed true error message
+                console.error("Call Accept Error:", e);
+                alert("Connection Error: " + (e.message || "Network timeout"));
                 endCall();
             }
         });
@@ -480,7 +490,6 @@
         });
 
         function endCall() {
-            // Bulletproof hardware kill switch
             if(localStream) { 
                 localStream.getTracks().forEach(track => { track.stop(); track.enabled = false; }); 
                 document.getElementById('local-video').srcObject = null;
@@ -857,7 +866,6 @@
                     mediaRecorder.onstop = async () => {
                         const uploadingBanner = document.getElementById('uploading-banner'); uploadingBanner.textContent = "Sending voice note..."; uploadingBanner.classList.remove('hidden');
                         
-                        // Removed hardcoded type so iOS Safari can use its native format automatically
                         const audioBlob = new Blob(audioChunks); 
                         const formData = new FormData(); formData.append('file', audioBlob); formData.append('upload_preset', CLOUDINARY_PRESET);
                         
