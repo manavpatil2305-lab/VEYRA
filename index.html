@@ -19,7 +19,7 @@
 <body class="bg-[#0B141A] text-[#E9EDEF] font-sans h-[100dvh] flex flex-col overflow-hidden relative">
 
     <!-- AUDIO FOR INCOMING RINGTONE -->
-    <audio id="ringtone-audio" src="https://assets.mixkit.co/active_storage/sfx/2870/2870-preview.mp3" loop></audio>
+    <audio id="ringtone-audio" src="https://assets.mixkit.co/active_storage/sfx/2870/2870-preview.mp3" loop preload="auto"></audio>
 
     <!-- INCOMING CALL SCREEN -->
     <div id="incoming-call-screen" class="hidden flex-col items-center justify-between h-full w-full bg-[#0B141A]/95 backdrop-blur-md absolute top-0 left-0 z-[70] pb-12 pt-20">
@@ -76,7 +76,7 @@
         <p class="text-gray-400 mb-8 text-center text-sm">This is how friends will find you. No emails shared.</p>
         <div class="w-full max-w-sm bg-[#202C33] rounded-lg p-4 flex items-center gap-3 mb-6">
             <span class="text-gray-500 font-bold">@</span>
-            <input type="text" id="username-input" placeholder="manav_23" class="bg-transparent outline-none text-white w-full lowercase">
+            <input type="text" id="username-input" placeholder="manav_23" autocomplete="off" spellcheck="false" class="bg-transparent outline-none text-white w-full lowercase">
         </div>
         <button id="save-username-btn" class="w-full max-w-sm bg-[#25D366] text-[#0B141A] font-bold py-3 rounded-full cursor-pointer">Complete Profile</button>
     </div>
@@ -93,7 +93,7 @@
         <div class="px-4 py-2 relative z-40 border-b border-[#202C33]">
             <div class="bg-[#202C33] rounded-full flex items-center px-4 py-2 gap-3 mb-2">
                 <span class="text-gray-400">🔍</span>
-                <input type="text" id="search-users-input" placeholder="Search username to find people..." class="bg-transparent outline-none text-sm w-full text-white">
+                <input type="text" id="search-users-input" placeholder="Search username to find people..." autocomplete="off" spellcheck="false" class="bg-transparent outline-none text-sm w-full text-white">
             </div>
             <div id="search-results" class="hidden absolute top-14 left-4 right-4 bg-[#202C33] rounded-xl shadow-xl p-2 flex-col gap-1 max-h-60 overflow-y-auto"></div>
         </div>
@@ -252,7 +252,7 @@
             <input type="file" id="media-input" accept="image/*" class="hidden">
             <span id="attach-btn" class="text-gray-400 text-2xl px-2 cursor-pointer">+</span>
             
-            <input type="text" id="message-input" placeholder="Message" class="flex-1 bg-[#2A3942] text-white rounded-full px-4 py-2 outline-none text-sm">
+            <input type="text" id="message-input" autocomplete="off" spellcheck="false" placeholder="Message" class="flex-1 bg-[#2A3942] text-white rounded-full px-4 py-2 outline-none text-sm">
             
             <div id="send-btn" class="hidden w-10 h-10 bg-[#25D366] rounded-full flex items-center justify-center cursor-pointer flex-shrink-0">
                 <span class="text-[#0B141A] font-bold">➤</span>
@@ -302,6 +302,14 @@
 
         let currentUser = null; let currentUserData = null;
         let activeChatId = null; let currentActiveChatUser = null; 
+        
+        // Safe check for local storage
+        try {
+            if(localStorage.getItem('veyra_active_user')) {
+                currentActiveChatUser = JSON.parse(localStorage.getItem('veyra_active_user'));
+            }
+        } catch(e) { localStorage.removeItem('veyra_active_user'); }
+
         let currentChatListener = null; let typingListener = null; let userStatusListener = null;
         let viewingProfileUser = null; let isFollowingTarget = false; let hasRequestedTarget = false;
         let previousScreen = 'main';
@@ -338,7 +346,7 @@
         setInterval(setOnlineStatus, 45000); 
 
         // ==========================================
-        // WEBRTC CALLING ENGINE
+        // WEBRTC CALLING ENGINE - WITH BULLETPROOF CAMERA KILL SWITCH
         // ==========================================
         let pc; let localStream; let remoteStream; let currentCallDocId = null; 
         let callUnsub = null; let callerIceUnsub = null; let calleeIceUnsub = null;
@@ -391,7 +399,7 @@
                 });
             } catch(e) {
                 alert("Could not access camera/microphone.");
-                document.getElementById('active-call-screen').classList.add('hidden');
+                endCall();
             }
         });
 
@@ -472,8 +480,18 @@
         });
 
         function endCall() {
+            // Bulletproof hardware kill switch
+            if(localStream) { 
+                localStream.getTracks().forEach(track => { track.stop(); track.enabled = false; }); 
+                document.getElementById('local-video').srcObject = null;
+                localStream = null; 
+            }
+            if(remoteStream) {
+                remoteStream.getTracks().forEach(track => track.stop());
+                document.getElementById('remote-video').srcObject = null;
+                remoteStream = null;
+            }
             if(pc) { pc.close(); pc = null; }
-            if(localStream) { localStream.getTracks().forEach(track => track.stop()); localStream = null; }
             if(callUnsub) callUnsub(); if(callerIceUnsub) callerIceUnsub(); if(calleeIceUnsub) calleeIceUnsub();
             
             document.getElementById('active-call-screen').classList.add('hidden');
@@ -504,47 +522,61 @@
 
 
         // ==========================================
-        // BULLETPROOF AUTH & ROUTING BOOT
+        // LOCALSTORAGE AUTH BYPASS
         // ==========================================
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 currentUser = user;
+                const userDocRef = doc(db, "users", user.uid);
+                
                 try {
-                    const userDocRef = doc(db, "users", user.uid);
                     const userDoc = await getDoc(userDocRef);
                     
                     if (userDoc.exists() && userDoc.data().username) {
                         currentUserData = userDoc.data();
-                        setOnlineStatus(); 
-                        document.getElementById('settings-name').textContent = currentUserData.name || "User";
-                        document.getElementById('settings-username').textContent = "@" + currentUserData.username;
-                        if(currentUserData.photoUrl) document.getElementById('settings-profile-pic').style.backgroundImage = `url('${currentUserData.photoUrl}')`;
-                        document.getElementById('private-account-toggle').checked = currentUserData.isPrivate === true;
-
-                        showScreen('main');
-                        loadInbox(); watchMyStats(); loadActivityTab(); loadStoriesEngine();
-                        listenForCalls();
-                    } else {
-                        // Automatically create default record so it doesn't loop
-                        await setDoc(userDocRef, {
+                        localStorage.setItem('veyra_username', currentUserData.username);
+                        bootMainApp();
+                    } else if (localStorage.getItem('veyra_username')) {
+                        const savedUsername = localStorage.getItem('veyra_username');
+                        currentUserData = {
                             uid: user.uid,
                             name: user.displayName || "User",
                             email: user.email || "",
                             photoUrl: user.photoURL || "",
+                            username: savedUsername,
                             isPrivate: false
-                        }, { merge: true });
-                        
+                        };
+                        await setDoc(userDocRef, currentUserData, { merge: true });
+                        bootMainApp();
+                    } else {
                         showScreen('username');
                     }
-                } catch (error) { showScreen('username'); }
-            } else { showScreen('login'); }
+                } catch (error) {
+                    if(localStorage.getItem('veyra_username')) { bootMainApp(); } else { showScreen('username'); }
+                }
+            } else {
+                localStorage.removeItem('veyra_username');
+                showScreen('login');
+            }
         });
+
+        function bootMainApp() {
+            setOnlineStatus(); 
+            document.getElementById('settings-name').textContent = currentUserData.name || "User";
+            document.getElementById('settings-username').textContent = "@" + currentUserData.username;
+            if(currentUserData.photoUrl) document.getElementById('settings-profile-pic').style.backgroundImage = `url('${currentUserData.photoUrl}')`;
+            document.getElementById('private-account-toggle').checked = currentUserData.isPrivate === true;
+
+            showScreen('main');
+            loadInbox(); watchMyStats(); loadActivityTab(); loadStoriesEngine();
+            listenForCalls();
+        }
 
         document.getElementById('save-username-btn').addEventListener('click', async () => {
             const rawUsername = document.getElementById('username-input').value.trim().toLowerCase();
             if(rawUsername.length < 3) return alert("Please type a username first!");
             try {
-                await setDoc(doc(db, "users", currentUser.uid), { 
+                const profileData = { 
                     uid: currentUser.uid, 
                     name: currentUser.displayName || "User", 
                     email: currentUser.email || "", 
@@ -552,8 +584,13 @@
                     username: rawUsername, 
                     isPrivate: false, 
                     joinedAt: serverTimestamp() 
-                }, { merge: true });
-                window.location.reload();
+                };
+                
+                localStorage.setItem('veyra_username', rawUsername);
+                await setDoc(doc(db, "users", currentUser.uid), profileData, { merge: true });
+                
+                currentUserData = profileData;
+                bootMainApp();
             } catch (err) { alert("Database Error: " + err.message); }
         });
 
@@ -703,13 +740,20 @@
                     const div = document.createElement('div'); div.className = "flex items-center gap-4 px-4 py-3 hover:bg-[#202C33] cursor-pointer border-b border-[#202C33]/50";
                     div.innerHTML = `<div class="w-12 h-12 bg-gray-600 rounded-full flex-shrink-0 avatar-btn" style="background-image: url('${chat.photoUrl || ''}'); background-size: cover;"></div><div class="flex-1 flex flex-col justify-center overflow-hidden chat-btn"><div class="flex justify-between items-center"><h2 class="text-lg font-normal text-white truncate">${chat.name || "User"}</h2>${unreadBadge}</div><div class="flex justify-between items-center"><p class="text-sm ${unreadBadge ? 'text-white font-medium' : 'text-gray-400'} truncate">${chat.lastMessage || ('@' + chat.username)}</p></div></div>`;
                     div.querySelector('.avatar-btn').addEventListener('click', (e) => { e.stopPropagation(); openProfileScreen(chat); });
-                    div.querySelector('.chat-btn').addEventListener('click', () => openPrivateChat(chat)); list.appendChild(div);
+                    div.querySelector('.chat-btn').addEventListener('click', () => {
+                        localStorage.setItem('veyra_active_user', JSON.stringify(chat));
+                        openPrivateChat(chat);
+                    }); 
+                    list.appendChild(div);
                 });
             });
         }
 
         document.getElementById('google-login-btn').addEventListener('click', () => signInWithPopup(auth, provider).catch(()=>{}));
-        document.getElementById('logout-btn').addEventListener('click', () => signOut(auth));
+        document.getElementById('logout-btn').addEventListener('click', () => {
+            localStorage.clear();
+            signOut(auth).then(() => window.location.reload());
+        });
         
         const searchInput = document.getElementById('search-users-input'); const searchResults = document.getElementById('search-results');
         searchInput.addEventListener('input', async (e) => {
@@ -758,7 +802,10 @@
             }
         });
 
-        document.getElementById('profile-message-btn').addEventListener('click', () => openPrivateChat(viewingProfileUser));
+        document.getElementById('profile-message-btn').addEventListener('click', () => {
+            localStorage.setItem('veyra_active_user', JSON.stringify(viewingProfileUser));
+            openPrivateChat(viewingProfileUser);
+        });
         document.getElementById('profile-back-btn').addEventListener('click', () => showScreen('main'));
 
         function openPrivateChat(otherUser) {
@@ -768,7 +815,9 @@
             const statusEl = document.getElementById('chat-header-status'); statusEl.textContent = "@" + otherUser.username; statusEl.classList.remove('text-[#25D366]'); statusEl.classList.add('text-gray-400');
             if(otherUser.photoUrl) document.getElementById('chat-header-pic').style.backgroundImage = `url('${otherUser.photoUrl}')`;
             setDoc(doc(db, `users/${currentUser.uid}/inbox/${otherUser.uid}`), { isRead: true }, {merge: true}).catch(e=>{}); showScreen('chat');
+            
             if(typingListener) typingListener(); if(userStatusListener) userStatusListener();
+            if(currentChatListener) currentChatListener();
             
             userStatusListener = onSnapshot(doc(db, "users", otherUser.uid), (docSnap) => {
                 if(!docSnap.exists()) return; const data = docSnap.data();
@@ -807,7 +856,11 @@
                     mediaRecorder = new MediaRecorder(stream); audioChunks = []; mediaRecorder.ondataavailable = e => { if (e.data.size > 0) audioChunks.push(e.data); };
                     mediaRecorder.onstop = async () => {
                         const uploadingBanner = document.getElementById('uploading-banner'); uploadingBanner.textContent = "Sending voice note..."; uploadingBanner.classList.remove('hidden');
-                        const audioBlob = new Blob(audioChunks, { type: 'audio/webm' }); const formData = new FormData(); formData.append('file', audioBlob); formData.append('upload_preset', CLOUDINARY_PRESET);
+                        
+                        // Removed hardcoded type so iOS Safari can use its native format automatically
+                        const audioBlob = new Blob(audioChunks); 
+                        const formData = new FormData(); formData.append('file', audioBlob); formData.append('upload_preset', CLOUDINARY_PRESET);
+                        
                         try {
                             const res = await fetch(CLOUDINARY_URL, { method: 'POST', body: formData }); const data = await res.json();
                             if(data.secure_url) {
@@ -829,7 +882,7 @@
         document.getElementById('back-btn').addEventListener('click', () => {
             if(currentChatListener) currentChatListener(); if(typingListener) typingListener(); if(userStatusListener) userStatusListener();
             if(activeChatId && currentUser) setDoc(doc(db, "chats", activeChatId), { typing: { [currentUser.uid]: false } }, { merge: true }).catch(()=>{});
-            activeChatId = null; currentActiveChatUser = null; showScreen('main');
+            activeChatId = null; currentActiveChatUser = null; localStorage.removeItem('veyra_active_user'); showScreen('main');
         });
 
         document.getElementById('attach-btn').addEventListener('click', () => { if(!IMGBB_API_KEY) return; document.getElementById('media-input').click(); });
