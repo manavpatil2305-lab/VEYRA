@@ -10,6 +10,9 @@
     <style>
         ::-webkit-scrollbar { display: none; }
         body { -webkit-tap-highlight-color: transparent; }
+        /* Custom styling for audio element to make it fit the dark theme better */
+        audio { height: 35px; outline: none; }
+        audio::-webkit-media-controls-panel { background-color: #E9EDEF; }
     </style>
 </head>
 <body class="bg-[#0B141A] text-[#E9EDEF] font-sans h-[100dvh] flex flex-col overflow-hidden relative">
@@ -198,15 +201,22 @@
         
         <main id="messages-area" class="flex-1 overflow-y-auto p-4 flex flex-col gap-3 relative bg-[#0B141A]" style="background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); background-size: cover;"></main>
         
-        <div id="uploading-banner" class="hidden bg-[#202C33] text-[#25D366] text-xs text-center py-1 font-bold z-20">Uploading photo via ImgBB...</div>
+        <div id="uploading-banner" class="hidden bg-[#202C33] text-[#25D366] text-xs text-center py-1 font-bold z-20">Processing media...</div>
 
         <footer class="bg-[#202C33] p-2 flex items-center gap-2 pb-4 z-20">
             <input type="file" id="media-input" accept="image/*" class="hidden">
             <span id="attach-btn" class="text-gray-400 text-2xl px-2 cursor-pointer">+</span>
             
             <input type="text" id="message-input" placeholder="Message" class="flex-1 bg-[#2A3942] text-white rounded-full px-4 py-2 outline-none text-sm">
-            <div id="send-btn" class="w-10 h-10 bg-[#25D366] rounded-full flex items-center justify-center cursor-pointer flex-shrink-0">
+            
+            <!-- SEND BUTTON (Hidden initially) -->
+            <div id="send-btn" class="hidden w-10 h-10 bg-[#25D366] rounded-full flex items-center justify-center cursor-pointer flex-shrink-0">
                 <span class="text-[#0B141A] font-bold">➤</span>
+            </div>
+            
+            <!-- MIC BUTTON (Shown initially) -->
+            <div id="mic-btn" class="w-10 h-10 bg-[#00A884] rounded-full flex items-center justify-center cursor-pointer flex-shrink-0 transition-colors">
+                <span class="text-white text-xl">🎤</span>
             </div>
         </footer>
     </div>
@@ -216,8 +226,10 @@
         import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc, updateDoc, deleteDoc, collection, addDoc, query, where, getDocs, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-        // IMGBB API KEY INJECTED HERE
+        // API KEYS
         const IMGBB_API_KEY = "177897c819f1b412a9ccb80a985592b4"; 
+        const CLOUDINARY_URL = "https://api.cloudinary.com/v1_1/qgxyzvks/video/upload";
+        const CLOUDINARY_PRESET = "veyra-audio";
         
         const firebaseConfig = {
             apiKey: "AIzaSyCAqrAiYLLnFoa_JmU8A3jXPk0KoZukCVk",
@@ -277,7 +289,6 @@
             }
         }
 
-        // BUG FIX: Only ping online status IF profile is fully created and verified
         function setOnlineStatus() {
             if(currentUser && currentUserData && currentUserData.username) {
                 setDoc(doc(db, "users", currentUser.uid), { lastActive: serverTimestamp() }, { merge: true }).catch(()=>{});
@@ -293,7 +304,7 @@
                     if (userDoc.exists() && userDoc.data().username) {
                         currentUserData = userDoc.data();
                         
-                        setOnlineStatus(); // Safe to ping now
+                        setOnlineStatus(); 
                         
                         document.getElementById('settings-name').textContent = currentUserData.name || "User";
                         document.getElementById('settings-username').textContent = "@" + currentUserData.username;
@@ -308,7 +319,6 @@
                         showScreen('username');
                     }
                 } catch (error) { 
-                    console.error("Auth Load Error:", error);
                     showScreen('username'); 
                 }
             } else {
@@ -316,7 +326,6 @@
             }
         });
 
-        // BUG FIX: Aggressive || "" fallbacks prevent Firestore undefined crashes
         document.getElementById('save-username-btn').addEventListener('click', async () => {
             const rawUsername = document.getElementById('username-input').value.trim().toLowerCase();
             
@@ -338,8 +347,7 @@
                 
                 window.location.reload();
             } catch (err) {
-                console.error("Save User Error:", err);
-                alert("Database Error: " + err.message + "\n\n(If this says 'Missing or insufficient permissions', your Firestore 30-day test mode expired. Go to Firebase > Firestore > Rules and change to 'allow read, write: if true;')");
+                alert("Database Error: " + err.message);
             }
         });
 
@@ -476,7 +484,6 @@
             if(targetUser.photoUrl) document.getElementById('profile-page-pic').style.backgroundImage = `url('${targetUser.photoUrl}')`;
             showScreen('profile');
 
-            const statsContainer = document.getElementById('profile-stats-container');
             const privateWarning = document.getElementById('profile-private-warning');
             const msgBtn = document.getElementById('profile-message-btn');
             const followBtn = document.getElementById('profile-follow-btn');
@@ -596,14 +603,114 @@
             loadPrivateMessages();
         }
 
+        // TOGGLE SEND/MIC BUTTON LOGIC
+        const msgInputEl = document.getElementById('message-input');
+        const sendBtnEl = document.getElementById('send-btn');
+        const micBtnEl = document.getElementById('mic-btn');
+
         let typingTimeout = null;
-        document.getElementById('message-input').addEventListener('input', () => {
+        msgInputEl.addEventListener('input', () => {
             if(!activeChatId || !currentUser) return;
+            
+            // Toggle Buttons
+            if(msgInputEl.value.trim().length > 0) {
+                sendBtnEl.classList.remove('hidden');
+                micBtnEl.classList.add('hidden');
+            } else {
+                sendBtnEl.classList.add('hidden');
+                micBtnEl.classList.remove('hidden');
+            }
+
+            // Typing Indicator
             setDoc(doc(db, "chats", activeChatId), { typing: { [currentUser.uid]: true } }, { merge: true }).catch(()=>{});
             clearTimeout(typingTimeout);
             typingTimeout = setTimeout(() => {
                 setDoc(doc(db, "chats", activeChatId), { typing: { [currentUser.uid]: false } }, { merge: true }).catch(()=>{});
             }, 2000);
+        });
+
+        // ==========================================
+        // VOICE NOTES RECORDING ENGINE
+        // ==========================================
+        let mediaRecorder;
+        let audioChunks = [];
+        let isRecording = false;
+
+        micBtnEl.addEventListener('click', async () => {
+            if (!activeChatId || !currentActiveChatUser) return;
+            
+            if (!isRecording) {
+                // START RECORDING
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    mediaRecorder = new MediaRecorder(stream);
+                    audioChunks = [];
+                    
+                    mediaRecorder.ondataavailable = e => {
+                        if (e.data.size > 0) audioChunks.push(e.data);
+                    };
+                    
+                    mediaRecorder.onstop = async () => {
+                        const uploadingBanner = document.getElementById('uploading-banner');
+                        uploadingBanner.textContent = "Sending voice note...";
+                        uploadingBanner.classList.remove('hidden');
+                        
+                        const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                        const formData = new FormData();
+                        formData.append('file', audioBlob);
+                        formData.append('upload_preset', CLOUDINARY_PRESET);
+                        
+                        try {
+                            const res = await fetch(CLOUDINARY_URL, {
+                                method: 'POST',
+                                body: formData
+                            });
+                            const data = await res.json();
+                            
+                            if(data.secure_url) {
+                                const timerEl = document.getElementById('disappearing-timer');
+                                const timer = timerEl ? timerEl.value : "off";
+                                
+                                await addDoc(collection(db, `chats/${activeChatId}/messages`), { 
+                                    text: "", 
+                                    mediaUrl: data.secure_url, 
+                                    mediaType: 'audio', 
+                                    senderUid: currentUser.uid, 
+                                    timer: timer, 
+                                    isRead: false, 
+                                    timestamp: serverTimestamp() 
+                                });
+                                
+                                await setDoc(doc(db, `users/${currentUser.uid}/inbox/${currentActiveChatUser.uid}`), { uid: currentActiveChatUser.uid, name: currentActiveChatUser.name || "User", username: currentActiveChatUser.username, photoUrl: currentActiveChatUser.photoUrl || "", lastMessage: "🎤 Voice Note", lastSenderId: currentUser.uid, isRead: true, timestamp: serverTimestamp() }, {merge: true});
+                                await setDoc(doc(db, `users/${currentActiveChatUser.uid}/inbox/${currentUser.uid}`), { uid: currentUser.uid, name: currentUserData.name || "User", username: currentUserData.username, photoUrl: currentUserData.photoUrl || "", lastMessage: "🎤 Voice Note", lastSenderId: currentUser.uid, isRead: false, timestamp: serverTimestamp() }, {merge: true});
+                                await setDoc(doc(db, `users/${currentActiveChatUser.uid}/activity/${currentUser.uid}_msg`), { type: 'new_message', uid: currentUser.uid, username: currentUserData.username, photoUrl: currentUserData.photoUrl || "", timestamp: serverTimestamp() });
+                            }
+                        } catch (err) {
+                            alert('Voice note upload failed.');
+                        } finally {
+                            uploadingBanner.classList.add('hidden');
+                            uploadingBanner.textContent = "Processing media..."; // reset
+                        }
+                    };
+                    
+                    mediaRecorder.start();
+                    isRecording = true;
+                    micBtnEl.classList.remove('bg-[#00A884]');
+                    micBtnEl.classList.add('bg-red-600', 'animate-pulse');
+                    micBtnEl.innerHTML = '<span class="text-white text-xl">⏹</span>';
+                    
+                } catch (err) {
+                    alert("Microphone access denied. Please allow mic permissions in your browser settings.");
+                }
+            } else {
+                // STOP RECORDING & SEND
+                mediaRecorder.stop();
+                mediaRecorder.stream.getTracks().forEach(track => track.stop());
+                isRecording = false;
+                micBtnEl.classList.remove('bg-red-600', 'animate-pulse');
+                micBtnEl.classList.add('bg-[#00A884]');
+                micBtnEl.innerHTML = '<span class="text-white text-xl">🎤</span>';
+            }
         });
 
         document.getElementById('chat-header-pic').addEventListener('click', () => openProfileScreen(currentActiveChatUser));
@@ -625,7 +732,10 @@
         document.getElementById('media-input').addEventListener('change', async (e) => {
             const file = e.target.files[0];
             if(!file || !activeChatId || !currentActiveChatUser) return;
-            e.target.value = ""; document.getElementById('uploading-banner').classList.remove('hidden');
+            e.target.value = ""; 
+            const uploadingBanner = document.getElementById('uploading-banner');
+            uploadingBanner.textContent = "Uploading photo via ImgBB...";
+            uploadingBanner.classList.remove('hidden');
             
             try {
                 const formData = new FormData(); formData.append("image", file);
@@ -647,19 +757,21 @@
             } catch(error) {
                 alert("Upload error.");
             } finally { 
-                document.getElementById('uploading-banner').classList.add('hidden'); 
+                uploadingBanner.classList.add('hidden'); 
             }
         });
 
-        // BUG FIX: Aggressive Safe Payloads prevent Firestore crashes during Send!
-        document.getElementById('send-btn').addEventListener('click', async () => {
-            const text = document.getElementById('message-input').value.trim();
+        sendBtnEl.addEventListener('click', async () => {
+            const text = msgInputEl.value.trim();
             const timerEl = document.getElementById('disappearing-timer');
             const timer = timerEl ? timerEl.value : "off";
             
             if (!text || !activeChatId || !currentActiveChatUser) return;
             
-            document.getElementById('message-input').value = "";
+            msgInputEl.value = "";
+            sendBtnEl.classList.add('hidden');
+            micBtnEl.classList.remove('hidden');
+            
             setDoc(doc(db, "chats", activeChatId), { typing: { [currentUser.uid]: false } }, { merge: true }).catch(()=>{});
             clearTimeout(typingTimeout);
             setOnlineStatus(); 
@@ -704,13 +816,12 @@
                 });
 
             } catch(e) { 
-                console.error("SEND ERROR:", e);
-                alert("Message failed to send: " + e.message + "\n\n(Please check your Firebase Rules)"); 
+                alert("Message failed to send: " + e.message); 
             }
         });
 
-        document.getElementById('message-input').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') document.getElementById('send-btn').click();
+        msgInputEl.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendBtnEl.click();
         });
 
         function loadPrivateMessages() {
@@ -739,8 +850,15 @@
                     const timerIcon = msg.timer && msg.timer !== "off" ? "⏱️" : "";
                     const tickColor = msg.isRead ? "text-[#34B7F1]" : "text-gray-400";
                     const ticksHtml = isMe ? `<span class="${tickColor} font-bold text-xs tracking-tighter">✓✓</span>` : '';
+                    
                     let mediaHtml = '';
-                    if (msg.mediaUrl) mediaHtml = `<img src="${msg.mediaUrl}" class="w-full max-w-[250px] rounded-lg mb-1 object-cover cursor-pointer">`;
+                    if (msg.mediaUrl) {
+                        if(msg.mediaType === 'audio') {
+                            mediaHtml = `<audio src="${msg.mediaUrl}" controls class="w-[200px] sm:w-[240px] mb-1"></audio>`;
+                        } else {
+                            mediaHtml = `<img src="${msg.mediaUrl}" class="w-full max-w-[250px] rounded-lg mb-1 object-cover cursor-pointer">`;
+                        }
+                    }
 
                     const div = document.createElement('div');
                     div.className = isMe ? "self-end max-w-[80%] bg-[#005C4B] text-white rounded-lg p-2 rounded-tr-none shadow" : "self-start max-w-[80%] bg-[#202C33] text-white rounded-lg p-2 rounded-tl-none shadow";
