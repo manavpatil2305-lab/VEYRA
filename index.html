@@ -344,7 +344,7 @@
         setInterval(setOnlineStatus, 45000); 
 
         // ==========================================
-        // WEBRTC CALLING ENGINE - BUG FIXES APPLIED
+        // WEBRTC CALLING ENGINE - PATH BUG FIXED
         // ==========================================
         let pc; let localStream; let remoteStream; let currentCallDocId = null; 
         let callUnsub = null; let callerIceUnsub = null; let calleeIceUnsub = null;
@@ -357,7 +357,6 @@
             document.getElementById('call-connecting-banner').classList.remove('hidden');
 
             try {
-                // BUG FIX: Mobile-optimized constraints
                 localStream = await navigator.mediaDevices.getUserMedia({ 
                     video: { facingMode: "user" }, 
                     audio: { echoCancellation: true } 
@@ -380,7 +379,8 @@
                 await pc.setLocalDescription(offerDescription);
                 await setDoc(callDoc, { offer: { type: offerDescription.type, sdp: offerDescription.sdp } });
 
-                await setDoc(doc(db, `users/${currentActiveChatUser.uid}/incoming_call`), {
+                // BUG FIX: Even number of segments (incoming_calls / UID)
+                await setDoc(doc(db, 'incoming_calls', currentActiveChatUser.uid), {
                     callerUid: currentUser.uid, callerName: currentUserData.name || currentUserData.username,
                     callerPhoto: currentUserData.photoUrl || '', callDocId: currentCallDocId, timestamp: serverTimestamp()
                 });
@@ -400,7 +400,6 @@
                     });
                 });
             } catch(e) {
-                // BUG FIX: Exposed true error message
                 console.error("Call Setup Error:", e);
                 alert("Connection Error: " + (e.message || "Network timeout"));
                 endCall();
@@ -408,7 +407,8 @@
         });
 
         function listenForCalls() {
-            onSnapshot(doc(db, `users/${currentUser.uid}/incoming_call`), docSnap => {
+            // BUG FIX: Listen to 2-segment path
+            onSnapshot(doc(db, 'incoming_calls', currentUser.uid), docSnap => {
                 if(docSnap.exists()) {
                     const data = docSnap.data();
                     if(data.timestamp && Date.now() - data.timestamp.toMillis() > 60000) return;
@@ -435,10 +435,9 @@
             document.getElementById('active-call-screen').classList.remove('hidden');
             document.getElementById('call-connecting-banner').classList.add('hidden');
             
-            deleteDoc(doc(db, `users/${currentUser.uid}/incoming_call`)).catch(()=>{});
+            deleteDoc(doc(db, 'incoming_calls', currentUser.uid)).catch(()=>{});
 
             try {
-                // BUG FIX: Mobile-optimized constraints
                 localStream = await navigator.mediaDevices.getUserMedia({ 
                     video: { facingMode: "user" }, 
                     audio: { echoCancellation: true } 
@@ -475,7 +474,6 @@
                     if(!snapshot.exists()) endCall();
                 });
             } catch(e) {
-                // BUG FIX: Exposed true error message
                 console.error("Call Accept Error:", e);
                 alert("Connection Error: " + (e.message || "Network timeout"));
                 endCall();
@@ -484,7 +482,7 @@
 
         document.getElementById('decline-call-btn').addEventListener('click', () => {
             if(currentCallDocId) deleteDoc(doc(db, 'calls', currentCallDocId)).catch(()=>{});
-            deleteDoc(doc(db, `users/${currentUser.uid}/incoming_call`)).catch(()=>{});
+            deleteDoc(doc(db, 'incoming_calls', currentUser.uid)).catch(()=>{});
             document.getElementById('incoming-call-screen').classList.add('hidden');
             document.getElementById('ringtone-audio').pause();
         });
@@ -509,8 +507,8 @@
             
             if(currentCallDocId) {
                 deleteDoc(doc(db, 'calls', currentCallDocId)).catch(()=>{});
-                deleteDoc(doc(db, `users/${currentUser.uid}/incoming_call`)).catch(()=>{});
-                if(currentActiveChatUser) deleteDoc(doc(db, `users/${currentActiveChatUser.uid}/incoming_call`)).catch(()=>{});
+                deleteDoc(doc(db, 'incoming_calls', currentUser.uid)).catch(()=>{});
+                if(currentActiveChatUser) deleteDoc(doc(db, 'incoming_calls', currentActiveChatUser.uid)).catch(()=>{});
                 currentCallDocId = null;
             }
         }
