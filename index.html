@@ -41,28 +41,15 @@
 
     <!-- ACTIVE CALL ROOM -->
     <div id="active-call-screen" class="hidden h-full w-full bg-black absolute top-0 left-0 z-[80] overflow-hidden">
-        <!-- Remote Video -->
         <video id="remote-video" class="w-full h-full object-cover" autoplay playsinline></video>
-        
-        <!-- Local Video (PiP) -->
         <div class="absolute bottom-28 right-4 w-28 h-40 bg-gray-800 rounded-xl overflow-hidden border-2 border-[#202C33] shadow-2xl z-[85]">
             <video id="local-video" class="w-full h-full object-cover transform scale-x-[-1]" autoplay playsinline muted></video>
         </div>
-
-        <!-- Call Controls -->
         <div class="absolute bottom-8 left-0 w-full flex justify-center items-center gap-8 z-[90]">
-            <div id="toggle-mic-btn" class="w-12 h-12 bg-[#202C33]/80 rounded-full flex items-center justify-center cursor-pointer backdrop-blur-sm border border-gray-600">
-                <span class="text-white text-xl">🎤</span>
-            </div>
-            <div id="end-call-btn" class="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center cursor-pointer shadow-lg shadow-red-600/50">
-                <span class="text-white text-3xl transform rotate-[135deg]">📞</span>
-            </div>
-            <div id="toggle-cam-btn" class="w-12 h-12 bg-[#202C33]/80 rounded-full flex items-center justify-center cursor-pointer backdrop-blur-sm border border-gray-600">
-                <span class="text-white text-xl">📷</span>
-            </div>
+            <div id="toggle-mic-btn" class="w-12 h-12 bg-[#202C33]/80 rounded-full flex items-center justify-center cursor-pointer backdrop-blur-sm border border-gray-600"><span class="text-white text-xl">🎤</span></div>
+            <div id="end-call-btn" class="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center cursor-pointer shadow-lg shadow-red-600/50"><span class="text-white text-3xl transform rotate-[135deg]">📞</span></div>
+            <div id="toggle-cam-btn" class="w-12 h-12 bg-[#202C33]/80 rounded-full flex items-center justify-center cursor-pointer backdrop-blur-sm border border-gray-600"><span class="text-white text-xl">📷</span></div>
         </div>
-        
-        <!-- Connecting overlay -->
         <div id="call-connecting-banner" class="absolute top-12 left-0 w-full text-center z-[90]">
             <span class="bg-[#0B141A]/70 text-white px-4 py-2 rounded-full text-sm backdrop-blur-md">Connecting...</span>
         </div>
@@ -111,7 +98,6 @@
             <div id="search-results" class="hidden absolute top-14 left-4 right-4 bg-[#202C33] rounded-xl shadow-xl p-2 flex-col gap-1 max-h-60 overflow-y-auto"></div>
         </div>
 
-        <!-- 24-HOUR STORIES ENGINE -->
         <div id="stories-wrapper" class="px-4 pt-4 pb-3 border-b border-[#202C33] bg-[#0B141A]">
             <div id="stories-list" class="flex gap-4 overflow-x-auto items-center pb-2 custom-scrollbar"></div>
             <input type="file" id="story-media-input" accept="image/*" class="hidden">
@@ -253,7 +239,6 @@
                 <h2 class="text-lg font-medium text-white" id="chat-header-name">Name</h2>
                 <span class="text-xs text-gray-400 font-medium" id="chat-header-status">@username</span>
             </div>
-            <!-- CALL BUTTON -->
             <div class="flex gap-4 text-xl items-center">
                 <span id="start-call-btn" class="cursor-pointer text-white hover:text-[#25D366] transition-colors">📞</span>
             </div>
@@ -359,7 +344,6 @@
         let callUnsub = null; let callerIceUnsub = null; let calleeIceUnsub = null;
         const pcConfig = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }, { urls: 'stun:stun1.l.google.com:19302' }] };
 
-        // 1. Initiate Call (Caller)
         document.getElementById('start-call-btn').addEventListener('click', async () => {
             if(!currentActiveChatUser) return;
             currentCallDocId = activeChatId;
@@ -386,14 +370,13 @@
                 await pc.setLocalDescription(offerDescription);
                 await setDoc(callDoc, { offer: { type: offerDescription.type, sdp: offerDescription.sdp } });
 
-                // Ring the receiver
                 await setDoc(doc(db, `users/${currentActiveChatUser.uid}/incoming_call`), {
                     callerUid: currentUser.uid, callerName: currentUserData.name || currentUserData.username,
                     callerPhoto: currentUserData.photoUrl || '', callDocId: currentCallDocId, timestamp: serverTimestamp()
                 });
 
                 callUnsub = onSnapshot(callDoc, snapshot => {
-                    if(!snapshot.exists()) { endCall(); return; } // Receiver denied or ended
+                    if(!snapshot.exists()) { endCall(); return; }
                     const data = snapshot.data();
                     if(!pc.currentRemoteDescription && data?.answer) {
                         pc.setRemoteDescription(new RTCSessionDescription(data.answer));
@@ -407,24 +390,23 @@
                     });
                 });
             } catch(e) {
-                alert("Could not access camera/microphone. Check permissions.");
+                alert("Could not access camera/microphone.");
                 document.getElementById('active-call-screen').classList.add('hidden');
             }
         });
 
-        // 2. Listen for Incoming Calls
         function listenForCalls() {
             onSnapshot(doc(db, `users/${currentUser.uid}/incoming_call`), docSnap => {
                 if(docSnap.exists()) {
                     const data = docSnap.data();
-                    if(data.timestamp && Date.now() - data.timestamp.toMillis() > 60000) return; // Ignore old rings
+                    if(data.timestamp && Date.now() - data.timestamp.toMillis() > 60000) return;
                     
                     currentCallDocId = data.callDocId;
                     document.getElementById('ring-caller-name').textContent = data.callerName;
                     document.getElementById('ring-caller-pic').style.backgroundImage = `url('${data.callerPhoto}')`;
                     document.getElementById('incoming-call-screen').classList.remove('hidden');
                     document.getElementById('incoming-call-screen').classList.add('flex');
-                    document.getElementById('ringtone-audio').play().catch(()=>{}); // Handle browser autoplay block
+                    document.getElementById('ringtone-audio').play().catch(()=>{});
                 } else {
                     document.getElementById('incoming-call-screen').classList.add('hidden');
                     document.getElementById('incoming-call-screen').classList.remove('flex');
@@ -434,7 +416,6 @@
             });
         }
 
-        // 3. Accept Call (Receiver)
         document.getElementById('accept-call-btn').addEventListener('click', async () => {
             document.getElementById('incoming-call-screen').classList.add('hidden');
             document.getElementById('incoming-call-screen').classList.remove('flex');
@@ -442,7 +423,6 @@
             document.getElementById('active-call-screen').classList.remove('hidden');
             document.getElementById('call-connecting-banner').classList.add('hidden');
             
-            // Clear incoming ping
             deleteDoc(doc(db, `users/${currentUser.uid}/incoming_call`)).catch(()=>{});
 
             try {
@@ -462,7 +442,7 @@
                 };
 
                 const callData = (await getDoc(callDoc)).data();
-                if(!callData || !callData.offer) return endCall(); // Call dropped
+                if(!callData || !callData.offer) return endCall();
                 
                 await pc.setRemoteDescription(new RTCSessionDescription(callData.offer));
                 const answerDescription = await pc.createAnswer();
@@ -476,7 +456,7 @@
                 });
                 
                 callUnsub = onSnapshot(callDoc, snapshot => {
-                    if(!snapshot.exists()) endCall(); // Caller ended
+                    if(!snapshot.exists()) endCall();
                 });
             } catch(e) {
                 alert("Could not access camera/microphone.");
@@ -484,7 +464,6 @@
             }
         });
 
-        // 4. Decline Call
         document.getElementById('decline-call-btn').addEventListener('click', () => {
             if(currentCallDocId) deleteDoc(doc(db, 'calls', currentCallDocId)).catch(()=>{});
             deleteDoc(doc(db, `users/${currentUser.uid}/incoming_call`)).catch(()=>{});
@@ -492,7 +471,6 @@
             document.getElementById('ringtone-audio').pause();
         });
 
-        // 5. End Call / Cleanup
         function endCall() {
             if(pc) { pc.close(); pc = null; }
             if(localStream) { localStream.getTracks().forEach(track => track.stop()); localStream = null; }
@@ -511,7 +489,6 @@
         }
         document.getElementById('end-call-btn').addEventListener('click', endCall);
 
-        // Call Controls
         document.getElementById('toggle-mic-btn').addEventListener('click', (e) => {
             if(!localStream) return;
             const audioTrack = localStream.getAudioTracks()[0];
@@ -527,13 +504,15 @@
 
 
         // ==========================================
-        // AUTH & CORE BOOT
+        // BULLETPROOF AUTH & ROUTING BOOT
         // ==========================================
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 currentUser = user;
                 try {
-                    const userDoc = await getDoc(doc(db, "users", user.uid));
+                    const userDocRef = doc(db, "users", user.uid);
+                    const userDoc = await getDoc(userDocRef);
+                    
                     if (userDoc.exists() && userDoc.data().username) {
                         currentUserData = userDoc.data();
                         setOnlineStatus(); 
@@ -544,8 +523,19 @@
 
                         showScreen('main');
                         loadInbox(); watchMyStats(); loadActivityTab(); loadStoriesEngine();
-                        listenForCalls(); // START WEBRTC LISTENER
-                    } else { showScreen('username'); }
+                        listenForCalls();
+                    } else {
+                        // Automatically create default record so it doesn't loop
+                        await setDoc(userDocRef, {
+                            uid: user.uid,
+                            name: user.displayName || "User",
+                            email: user.email || "",
+                            photoUrl: user.photoURL || "",
+                            isPrivate: false
+                        }, { merge: true });
+                        
+                        showScreen('username');
+                    }
                 } catch (error) { showScreen('username'); }
             } else { showScreen('login'); }
         });
@@ -554,7 +544,15 @@
             const rawUsername = document.getElementById('username-input').value.trim().toLowerCase();
             if(rawUsername.length < 3) return alert("Please type a username first!");
             try {
-                await setDoc(doc(db, "users", currentUser.uid), { uid: currentUser.uid, name: currentUser.displayName || "User", email: currentUser.email || "", photoUrl: currentUser.photoURL || "", username: rawUsername, isPrivate: false, joinedAt: serverTimestamp() }, { merge: true });
+                await setDoc(doc(db, "users", currentUser.uid), { 
+                    uid: currentUser.uid, 
+                    name: currentUser.displayName || "User", 
+                    email: currentUser.email || "", 
+                    photoUrl: currentUser.photoURL || "", 
+                    username: rawUsername, 
+                    isPrivate: false, 
+                    joinedAt: serverTimestamp() 
+                }, { merge: true });
                 window.location.reload();
             } catch (err) { alert("Database Error: " + err.message); }
         });
