@@ -10,26 +10,33 @@
     <style>
         ::-webkit-scrollbar { display: none; }
         body { -webkit-tap-highlight-color: transparent; }
-        audio { height: 35px; outline: none; }
-        audio::-webkit-media-controls-panel { background-color: #E9EDEF; }
-        .custom-scrollbar::-webkit-scrollbar { display: block; height: 3px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #2A3942; border-radius: 10px; }
+        audio.voice-note-player { height: 35px; outline: none; }
+        audio.voice-note-player::-webkit-media-controls-panel { background-color: #E9EDEF; }
     </style>
 </head>
 <body class="bg-[#0B141A] text-[#E9EDEF] font-sans h-[100dvh] flex flex-col overflow-hidden relative">
 
+    <!-- AUDIO ELEMENTS FOR RINGTONE & LIVE VOICE CALL -->
     <audio id="ringtone-audio" src="https://assets.mixkit.co/active_storage/sfx/2870/2870-preview.mp3" loop preload="auto"></audio>
+    <audio id="remote-audio" autoplay playsinline></audio>
 
-    <!-- INCOMING CALL SCREEN -->
-    <div id="incoming-call-screen" class="hidden flex-col items-center justify-between h-full w-full bg-[#0B141A]/95 backdrop-blur-md absolute top-0 left-0 z-[70] pb-12 pt-20">
-        <h2 class="text-[#25D366] text-xl font-bold tracking-widest drop-shadow-lg">VEYRA VIDEO CALL</h2>
-        <div class="flex flex-col items-center gap-6 mt-10">
-            <div id="ring-caller-pic" class="w-32 h-32 rounded-full bg-gray-600 bg-cover bg-center border-4 border-[#25D366] animate-pulse"></div>
-            <h3 id="ring-caller-name" class="text-3xl text-white font-bold drop-shadow-md">Name</h3>
-            <p class="text-gray-400">Incoming video call...</p>
+    <!-- INCOMING VOICE CALL SCREEN -->
+    <div id="incoming-call-screen" class="hidden flex-col items-center justify-between h-full w-full bg-[#0B141A]/95 backdrop-blur-md absolute top-0 left-0 z-[70] pb-14 pt-16">
+        <div class="flex flex-col items-center gap-2">
+            <div class="w-10 h-10 bg-gradient-to-tr from-[#25D366] to-[#00A884] rounded-xl flex items-center justify-center shadow-lg shadow-[#25D366]/20">
+                <span class="text-white font-black text-2xl">V</span>
+            </div>
+            <h2 class="text-[#25D366] text-lg font-bold tracking-widest drop-shadow-lg">VEYRA VOICE CALL</h2>
         </div>
+        
+        <div class="flex flex-col items-center gap-5 mt-6">
+            <div id="ring-caller-pic" class="w-32 h-32 rounded-full bg-gray-600 bg-cover bg-center border-4 border-[#25D366] animate-pulse shadow-[0_0_30px_rgba(37,211,102,0.4)]"></div>
+            <h3 id="ring-caller-name" class="text-3xl text-white font-bold drop-shadow-md">Name</h3>
+            <p class="text-gray-400">Incoming voice call...</p>
+        </div>
+
         <div class="flex gap-16 w-full justify-center mt-10">
-            <div id="decline-call-btn" class="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center cursor-pointer shadow-lg shadow-red-600/30">
+            <div id="decline-call-btn" class="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center cursor-pointer shadow-lg shadow-red-600/30 hover:scale-105 transition-transform">
                 <span class="text-white text-3xl transform rotate-[135deg]">📞</span>
             </div>
             <div id="accept-call-btn" class="w-16 h-16 bg-[#25D366] rounded-full flex items-center justify-center cursor-pointer shadow-lg shadow-[#25D366]/30 animate-bounce">
@@ -38,23 +45,41 @@
         </div>
     </div>
 
-    <!-- ACTIVE CALL ROOM -->
-    <div id="active-call-screen" class="hidden h-full w-full bg-black absolute top-0 left-0 z-[80] overflow-hidden">
-        <video id="remote-video" class="w-full h-full object-cover" autoplay playsinline></video>
-        <div class="absolute bottom-28 right-4 w-28 h-40 bg-gray-800 rounded-xl overflow-hidden border-2 border-[#202C33] shadow-2xl z-[85]">
-            <video id="local-video" class="w-full h-full object-cover transform scale-x-[-1]" autoplay playsinline muted></video>
+    <!-- ACTIVE VOICE CALL ROOM -->
+    <div id="active-call-screen" class="hidden flex-col items-center justify-between h-full w-full bg-gradient-to-b from-[#0B141A] via-[#111B21] to-[#0B141A] absolute top-0 left-0 z-[80] pb-14 pt-16 overflow-hidden">
+        <div class="flex flex-col items-center gap-2">
+            <div class="w-10 h-10 bg-gradient-to-tr from-[#25D366] to-[#00A884] rounded-xl flex items-center justify-center shadow-lg shadow-[#25D366]/20">
+                <span class="text-white font-black text-2xl">V</span>
+            </div>
+            <h2 class="text-[#25D366] text-sm font-bold tracking-[0.25em] uppercase">VEYRA VOICE CALL</h2>
         </div>
-        <div class="absolute bottom-8 left-0 w-full flex justify-center items-center gap-8 z-[90]">
-            <div id="toggle-mic-btn" class="w-12 h-12 bg-[#202C33]/80 rounded-full flex items-center justify-center cursor-pointer backdrop-blur-sm border border-gray-600"><span class="text-white text-xl">🎤</span></div>
-            <div id="end-call-btn" class="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center cursor-pointer shadow-lg shadow-red-600/50"><span class="text-white text-3xl transform rotate-[135deg]">📞</span></div>
-            <div id="toggle-cam-btn" class="w-12 h-12 bg-[#202C33]/80 rounded-full flex items-center justify-center cursor-pointer backdrop-blur-sm border border-gray-600"><span class="text-white text-xl">📷</span></div>
+
+        <div class="flex flex-col items-center gap-5">
+            <div class="p-2 rounded-full border-2 border-[#25D366]/40 shadow-[0_0_40px_rgba(37,211,102,0.2)]">
+                <div id="active-call-pic" class="w-36 h-36 rounded-full bg-gray-700 bg-cover bg-center border-2 border-[#25D366]"></div>
+            </div>
+            <h3 id="active-call-name" class="text-3xl text-white font-bold tracking-wide">User</h3>
+            <span id="call-status-text" class="bg-[#202C33] text-[#25D366] px-5 py-1.5 rounded-full text-sm font-semibold tracking-wider">Calling...</span>
         </div>
-        <div id="call-connecting-banner" class="absolute top-12 left-0 w-full text-center z-[90]">
-            <span class="bg-[#0B141A]/70 text-white px-4 py-2 rounded-full text-sm backdrop-blur-md">Connecting...</span>
+
+        <div class="flex justify-center items-center gap-12 w-full">
+            <div class="flex flex-col items-center gap-2">
+                <div id="toggle-mic-btn" class="w-14 h-14 bg-[#202C33] rounded-full flex items-center justify-center cursor-pointer border border-gray-600 transition-colors">
+                    <span class="text-white text-2xl">🎤</span>
+                </div>
+                <span id="mic-status-label" class="text-xs text-gray-400">Mute</span>
+            </div>
+
+            <div class="flex flex-col items-center gap-2">
+                <div id="end-call-btn" class="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center cursor-pointer shadow-lg shadow-red-600/50 hover:scale-105 transition-transform">
+                    <span class="text-white text-3xl transform rotate-[135deg]">📞</span>
+                </div>
+                <span class="text-xs text-gray-400">End</span>
+            </div>
         </div>
     </div>
 
-    <!-- CUSTOM LOGIN & SIGNUP SCREEN -->
+    <!-- EMAIL / PASSWORD LOGIN SCREEN -->
     <div id="login-screen" class="flex h-full flex-col items-center justify-center px-6 absolute top-0 left-0 w-full bg-[#0B141A] z-50">
         <div class="flex items-center gap-3 mb-8">
             <div class="w-12 h-12 bg-gradient-to-tr from-[#25D366] to-[#00A884] rounded-2xl flex items-center justify-center shadow-lg shadow-[#25D366]/20">
@@ -103,11 +128,6 @@
                 <input type="text" id="search-users-input" placeholder="Search username to find people..." autocomplete="off" spellcheck="false" class="bg-transparent outline-none text-sm w-full text-white">
             </div>
             <div id="search-results" class="hidden absolute top-14 left-4 right-4 bg-[#202C33] rounded-xl shadow-xl p-2 flex-col gap-1 max-h-60 overflow-y-auto"></div>
-        </div>
-
-        <div id="stories-wrapper" class="px-4 pt-4 pb-3 border-b border-[#202C33] bg-[#0B141A]">
-            <div id="stories-list" class="flex gap-4 overflow-x-auto items-center pb-2 custom-scrollbar"></div>
-            <input type="file" id="story-media-input" accept="image/*" class="hidden">
         </div>
 
         <main class="flex-1 overflow-y-auto relative pb-24" id="recent-chats-list">
@@ -160,7 +180,7 @@
         </header>
         
         <div class="flex flex-col items-center pt-4 pb-6 border-b border-[#202C33]">
-            <div id="profile-page-pic" class="w-24 h-24 bg-gray-600 rounded-full bg-cover bg-center mb-4"></div>
+            <div id="profile-page-pic" class="w-24 h-24 bg-gray-600 rounded-full bg-cover bg-center mb-4 border-2 border-[#202C33]"></div>
             <h2 id="profile-page-name" class="text-2xl font-bold text-white">Name</h2>
             <p id="profile-page-bio" class="text-sm text-gray-400 mt-1">VEYRA User</p>
             
@@ -197,7 +217,7 @@
         
         <div class="p-4 flex flex-col border-b border-[#202C33]">
             <div class="flex items-center gap-4">
-                <div id="settings-profile-pic" class="w-16 h-16 bg-gray-600 rounded-full bg-cover bg-center"></div>
+                <div id="settings-profile-pic" class="w-16 h-16 bg-gray-600 rounded-full bg-cover bg-center border-2 border-[#202C33]"></div>
                 <div>
                     <h2 id="settings-name" class="text-xl font-normal text-white">User</h2>
                     <p id="settings-username" class="text-sm text-[#25D366]">@username</p>
@@ -238,7 +258,6 @@
             <div class="bg-[#111B21] rounded-xl p-4 shadow-sm mb-4">
                 <button id="delete-account-btn" class="w-full bg-red-600/20 text-red-500 font-bold py-3 rounded-xl cursor-pointer hover:bg-red-600/40 transition-colors">Delete Account permanently</button>
             </div>
-            
         </div>
         <div class="p-4 pt-0"><button id="logout-btn" class="w-full bg-[#202C33] text-gray-400 font-bold py-3 rounded-xl cursor-pointer hover:bg-[#2A3942] transition-colors">Log Out</button></div>
     </div>
@@ -247,13 +266,13 @@
     <div id="chat-room" class="hidden flex-col h-full w-full bg-[#EFEAE2] absolute top-0 left-0 z-50">
         <header class="pt-4 pb-2 px-4 flex items-center gap-4 bg-[#202C33] shadow-md z-20">
             <span id="back-btn" class="text-white text-2xl cursor-pointer px-2">←</span>
-            <div class="w-10 h-10 bg-gray-600 rounded-full flex-shrink-0 cursor-pointer" id="chat-header-pic" style="background-size: cover;"></div>
+            <div class="w-10 h-10 bg-gray-600 rounded-full flex-shrink-0 cursor-pointer border border-[#2A3942]" id="chat-header-pic" style="background-size: cover;"></div>
             <div class="flex-1 cursor-pointer" id="chat-header-info">
                 <h2 class="text-lg font-medium text-white" id="chat-header-name">Name</h2>
                 <span class="text-xs text-gray-400 font-medium" id="chat-header-status">@username</span>
             </div>
             <div class="flex gap-4 text-xl items-center">
-                <span id="start-call-btn" class="cursor-pointer text-white hover:text-[#25D366] transition-colors">📞</span>
+                <span id="start-call-btn" class="cursor-pointer text-white hover:text-[#25D366] transition-colors" title="Voice Call">📞</span>
             </div>
         </header>
         
@@ -272,7 +291,7 @@
             
             <input type="text" id="message-input" autocomplete="off" spellcheck="false" placeholder="Message" class="flex-1 bg-[#2A3942] text-white rounded-full px-4 py-2 outline-none text-sm">
             
-            <div id="send-btn" class="hidden w-10 h-10 bg-[#25D366] rounded-full flex items-center justify-center cursor-pointer flex-shrink-0">
+            <div id="send-btn" class="hidden w-10 h-10 bg-[#25D366] rounded-full flex items-center justify-center cursor-pointer flex-shrink-0 hover:bg-[#1DA851] transition-colors">
                 <span class="text-[#0B141A] font-bold">➤</span>
             </div>
             
@@ -280,19 +299,6 @@
                 <span class="text-white text-xl">🎤</span>
             </div>
         </footer>
-    </div>
-
-    <!-- FULL SCREEN STORY VIEWER -->
-    <div id="story-viewer-screen" class="hidden flex-col h-full w-full bg-black absolute top-0 left-0 z-[60]">
-        <header class="pt-6 pb-4 px-4 flex items-center gap-4 absolute top-4 w-full z-10 bg-gradient-to-b from-black/80 to-transparent">
-            <span id="close-story-btn" class="text-white text-3xl cursor-pointer px-2 drop-shadow-md">←</span>
-            <div class="w-10 h-10 bg-gray-600 rounded-full flex-shrink-0 border border-white" id="story-viewer-pic" style="background-size: cover;"></div>
-            <div class="flex flex-col">
-                <h2 class="text-lg font-bold text-white drop-shadow-md" id="story-viewer-name">Name</h2>
-                <span class="text-xs text-gray-300 drop-shadow-md" id="story-viewer-time">Just now</span>
-            </div>
-        </header>
-        <div id="story-image-container" class="w-full h-full bg-contain bg-no-repeat bg-center" style="background-image: url('');"></div>
     </div>
 
     <script type="module">
@@ -317,175 +323,425 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        let currentUser = null; let currentUserData = null;
-        let activeChatId = null; let currentActiveChatUser = null; 
-        
+        let currentUser = null;
+        let currentUserData = null;
+        let activeChatId = null;
+        let currentActiveChatUser = null;
+        let isAppBooted = false;
+
         try {
-            if(localStorage.getItem('veyra_active_user')) {
+            if (localStorage.getItem('veyra_active_user')) {
                 currentActiveChatUser = JSON.parse(localStorage.getItem('veyra_active_user'));
             }
-        } catch(e) { localStorage.removeItem('veyra_active_user'); }
+        } catch (e) { localStorage.removeItem('veyra_active_user'); }
 
-        let currentChatListener = null; let typingListener = null; let userStatusListener = null;
-        let viewingProfileUser = null; let isFollowingTarget = false; let hasRequestedTarget = false;
+        let currentChatListener = null;
+        let typingListener = null;
+        let userStatusListener = null;
+        let profileFollowersUnsub = null;
+        let profileFollowingUnsub = null;
+
+        let viewingProfileUser = null;
+        let isFollowingTarget = false;
+        let hasRequestedTarget = false;
         let previousScreen = 'main';
 
         const screens = {
-            login: document.getElementById('login-screen'), username: document.getElementById('username-screen'),
-            main: document.getElementById('main-app'), activity: document.getElementById('activity-screen'),
-            settings: document.getElementById('settings-screen'), profile: document.getElementById('user-profile-screen'),
-            connections: document.getElementById('connections-screen'), chat: document.getElementById('chat-room')
+            login: document.getElementById('login-screen'),
+            username: document.getElementById('username-screen'),
+            main: document.getElementById('main-app'),
+            activity: document.getElementById('activity-screen'),
+            settings: document.getElementById('settings-screen'),
+            profile: document.getElementById('user-profile-screen'),
+            connections: document.getElementById('connections-screen'),
+            chat: document.getElementById('chat-room')
         };
         
         function showScreen(screenName) {
             Object.keys(screens).forEach(key => {
-                if(!screens[key].classList.contains('hidden') && key !== 'connections') previousScreen = key; 
-                screens[key].classList.add('hidden'); screens[key].classList.remove('flex');
+                if (!screens[key].classList.contains('hidden') && key !== 'connections') previousScreen = key; 
+                screens[key].classList.add('hidden');
+                screens[key].classList.remove('flex');
             });
-            screens[screenName].classList.remove('hidden'); screens[screenName].classList.add('flex');
+            screens[screenName].classList.remove('hidden');
+            screens[screenName].classList.add('flex');
             
-            if(['main', 'activity', 'settings'].includes(screenName)) {
+            if (['main', 'activity', 'settings'].includes(screenName)) {
                 ['chats', 'activity', 'settings'].forEach(nav => {
                     document.getElementById(`nav-${nav}`).classList.add('opacity-60');
                     document.getElementById(`nav-${nav}-icon`).classList.remove('bg-[#0A332C]');
                 });
-                document.getElementById(`nav-${screenName === 'main' ? 'chats' : screenName}`).classList.remove('opacity-60');
-                document.getElementById(`nav-${screenName === 'main' ? 'chats' : screenName}-icon`).classList.add('bg-[#0A332C]');
+                const navKey = screenName === 'main' ? 'chats' : screenName;
+                document.getElementById(`nav-${navKey}`).classList.remove('opacity-60');
+                document.getElementById(`nav-${navKey}-icon`).classList.add('bg-[#0A332C]');
             }
         }
 
         function setOnlineStatus() {
-            if(currentUser && currentUserData && currentUserData.username) {
-                setDoc(doc(db, "users", currentUser.uid), { lastActive: serverTimestamp() }, { merge: true }).catch(()=>{});
+            if (currentUser && currentUserData && currentUserData.username) {
+                setDoc(doc(db, "users", currentUser.uid), { lastActive: serverTimestamp() }, { merge: true }).catch(() => {});
             }
         }
-        setInterval(setOnlineStatus, 45000); 
+        setInterval(setOnlineStatus, 45000);
 
         // ==========================================
-        // CUSTOM EMAIL/PASSWORD AUTHENTICATION
+        // CUSTOM EMAIL / PASSWORD AUTHENTICATION
         // ==========================================
         document.getElementById('login-btn').addEventListener('click', async () => {
             const email = document.getElementById('auth-email').value.trim();
             const pass = document.getElementById('auth-password').value.trim();
-            if(!email || !pass) return alert("Please enter your email and password.");
+            if (!email || !pass) return alert("Please enter your email and password.");
             try { await signInWithEmailAndPassword(auth, email, pass); }
-            catch(err) { alert("Login failed. Check your credentials."); }
+            catch (err) { alert("Login failed. Please check your email and password."); }
         });
 
         document.getElementById('signup-btn').addEventListener('click', async () => {
             const email = document.getElementById('auth-email').value.trim();
             const pass = document.getElementById('auth-password').value.trim();
-            if(!email || !pass) return alert("Please enter an email and a strong password.");
-            if(pass.length < 6) return alert("Password must be at least 6 characters.");
+            if (!email || !pass) return alert("Please enter an email and a strong password.");
+            if (pass.length < 6) return alert("Password must be at least 6 characters.");
             try { await createUserWithEmailAndPassword(auth, email, pass); }
-            catch(err) { alert("Signup failed: " + err.message); }
+            catch (err) { alert("Signup failed: " + err.message); }
         });
 
         // ==========================================
-        // WEBRTC CALLING ENGINE 
+        // AUDIO-ONLY WEBRTC VOICE CALLING ENGINE
         // ==========================================
-        let pc; let localStream; let remoteStream; let currentCallDocId = null; 
-        let callUnsub = null; let callerIceUnsub = null; let calleeIceUnsub = null;
-        const pcConfig = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }, { urls: 'stun:stun1.l.google.com:19302' }] };
+        let pc = null;
+        let localStream = null;
+        let remoteStream = null;
+        let currentCallDocId = null;
+        let activeCallPartnerUid = null;
+        let incomingCallData = null;
+        let pendingIceCandidates = [];
 
+        let callUnsub = null;
+        let callerIceUnsub = null;
+        let calleeIceUnsub = null;
+        let callTimerInterval = null;
+        let callSeconds = 0;
+
+        const pcConfig = {
+            iceServers: [
+                { urls: 'stun:stun.l.google.com:19302' },
+                { urls: 'stun:stun1.l.google.com:19302' },
+                { urls: 'stun:stun2.l.google.com:19302' },
+                { urls: 'stun:stun3.l.google.com:19302' },
+                { urls: 'stun:stun4.l.google.com:19302' }
+            ]
+        };
+
+        function startCallTimer() {
+            if (callTimerInterval) return;
+            callSeconds = 0;
+            const statusEl = document.getElementById('call-status-text');
+            statusEl.textContent = "00:00";
+            callTimerInterval = setInterval(() => {
+                callSeconds++;
+                const mins = String(Math.floor(callSeconds / 60)).padStart(2, '0');
+                const secs = String(callSeconds % 60).padStart(2, '0');
+                statusEl.textContent = `${mins}:${secs}`;
+            }, 1000);
+        }
+
+        function stopCallTimer() {
+            if (callTimerInterval) {
+                clearInterval(callTimerInterval);
+                callTimerInterval = null;
+            }
+            callSeconds = 0;
+        }
+
+        function showActiveCallUI(name, photoUrl, initialStatus) {
+            document.getElementById('active-call-name').textContent = name || "User";
+            document.getElementById('active-call-pic').style.backgroundImage = `url('${photoUrl || ''}')`;
+            document.getElementById('call-status-text').textContent = initialStatus;
+            document.getElementById('toggle-mic-btn').style.backgroundColor = '#202C33';
+            document.getElementById('mic-status-label').textContent = 'Mute';
+
+            const screen = document.getElementById('active-call-screen');
+            screen.classList.remove('hidden');
+            screen.classList.add('flex');
+        }
+
+        async function flushPendingIceCandidates() {
+            while (pendingIceCandidates.length > 0 && pc && pc.remoteDescription) {
+                const candidate = pendingIceCandidates.shift();
+                try {
+                    await pc.addIceCandidate(new RTCIceCandidate(candidate));
+                } catch (err) { console.error("ICE Add Error:", err); }
+            }
+        }
+
+        function setupPeerConnectionAudio() {
+            pc = new RTCPeerConnection(pcConfig);
+            remoteStream = new MediaStream();
+            const remoteAudioEl = document.getElementById('remote-audio');
+            remoteAudioEl.srcObject = remoteStream;
+
+            localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
+
+            pc.ontrack = (event) => {
+                event.streams[0].getTracks().forEach(track => remoteStream.addTrack(track));
+                remoteAudioEl.play().catch(() => {});
+            };
+
+            pc.onconnectionstatechange = () => {
+                if (!pc) return;
+                if (pc.connectionState === 'connected') {
+                    startCallTimer();
+                } else if (pc.connectionState === 'failed' || pc.connectionState === 'disconnected') {
+                    document.getElementById('call-status-text').textContent = "Reconnecting...";
+                }
+            };
+        }
+
+        // 1. Start Outgoing Voice Call
         document.getElementById('start-call-btn').addEventListener('click', async () => {
-            if(!currentActiveChatUser) return;
-            currentCallDocId = activeChatId;
-            document.getElementById('active-call-screen').classList.remove('hidden');
-            document.getElementById('call-connecting-banner').classList.remove('hidden');
+            if (!currentActiveChatUser || !activeChatId) return;
+
+            // Unique Call ID per call prevents stale ICE candidates from previous calls
+            currentCallDocId = `${activeChatId}_${Date.now()}`;
+            activeCallPartnerUid = currentActiveChatUser.uid;
+            pendingIceCandidates = [];
+
+            showActiveCallUI(currentActiveChatUser.name || currentActiveChatUser.username, currentActiveChatUser.photoUrl, "Calling...");
 
             try {
-                localStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: { echoCancellation: true } });
-                document.getElementById('local-video').srcObject = localStream;
-                pc = new RTCPeerConnection(pcConfig); remoteStream = new MediaStream(); document.getElementById('remote-video').srcObject = remoteStream;
-                localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
-                pc.ontrack = event => event.streams[0].getTracks().forEach(track => remoteStream.addTrack(track));
+                localStream = await navigator.mediaDevices.getUserMedia({
+                    audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
+                    video: false
+                });
+
+                setupPeerConnectionAudio();
 
                 const callDoc = doc(db, 'calls', currentCallDocId);
-                pc.onicecandidate = event => { if(event.candidate) addDoc(collection(db, `calls/${currentCallDocId}/callerCandidates`), event.candidate.toJSON()); };
-                const offerDescription = await pc.createOffer(); await pc.setLocalDescription(offerDescription);
-                await setDoc(callDoc, { offer: { type: offerDescription.type, sdp: offerDescription.sdp } });
-                await setDoc(doc(db, 'incoming_calls', currentActiveChatUser.uid), { callerUid: currentUser.uid, callerName: currentUserData.name || currentUserData.username, callerPhoto: currentUserData.photoUrl || '', callDocId: currentCallDocId, timestamp: serverTimestamp() });
+                pc.onicecandidate = (event) => {
+                    if (event.candidate && currentCallDocId) {
+                        addDoc(collection(db, `calls/${currentCallDocId}/callerCandidates`), event.candidate.toJSON()).catch(() => {});
+                    }
+                };
 
-                callUnsub = onSnapshot(callDoc, snapshot => {
-                    if(!snapshot.exists()) { endCall(); return; }
-                    const data = snapshot.data();
-                    if(!pc.currentRemoteDescription && data?.answer) { pc.setRemoteDescription(new RTCSessionDescription(data.answer)); document.getElementById('call-connecting-banner').classList.add('hidden'); }
+                const offerDescription = await pc.createOffer();
+                await pc.setLocalDescription(offerDescription);
+                await setDoc(callDoc, {
+                    offer: { type: offerDescription.type, sdp: offerDescription.sdp },
+                    callerUid: currentUser.uid,
+                    calleeUid: activeCallPartnerUid,
+                    createdAt: serverTimestamp()
                 });
-                calleeIceUnsub = onSnapshot(collection(db, `calls/${currentCallDocId}/calleeCandidates`), snapshot => { snapshot.docChanges().forEach(change => { if(change.type === 'added') pc.addIceCandidate(new RTCIceCandidate(change.doc.data())); }); });
-            } catch(e) { console.error("Call Setup Error:", e); alert("Connection Error: " + (e.message || "Network timeout")); endCall(); }
+
+                await setDoc(doc(db, 'incoming_calls', activeCallPartnerUid), {
+                    callerUid: currentUser.uid,
+                    callerName: currentUserData.name || currentUserData.username,
+                    callerPhoto: currentUserData.photoUrl || '',
+                    callDocId: currentCallDocId,
+                    timestamp: serverTimestamp()
+                });
+
+                callUnsub = onSnapshot(callDoc, async (snapshot) => {
+                    if (!snapshot.exists()) {
+                        endCall();
+                        return;
+                    }
+                    const data = snapshot.data();
+                    if (pc && !pc.currentRemoteDescription && data?.answer) {
+                        document.getElementById('call-status-text').textContent = "Connecting...";
+                        await pc.setRemoteDescription(new RTCSessionDescription(data.answer));
+                        await flushPendingIceCandidates();
+                    }
+                });
+
+                calleeIceUnsub = onSnapshot(collection(db, `calls/${currentCallDocId}/calleeCandidates`), (snapshot) => {
+                    snapshot.docChanges().forEach((change) => {
+                        if (change.type === 'added') {
+                            const candData = change.doc.data();
+                            if (pc && pc.remoteDescription) {
+                                pc.addIceCandidate(new RTCIceCandidate(candData)).catch(() => {});
+                            } else {
+                                pendingIceCandidates.push(candData);
+                            }
+                        }
+                    });
+                });
+            } catch (e) {
+                console.error("Voice Call Setup Error:", e);
+                alert("Voice Call Error: " + (e.message || "Could not access microphone."));
+                endCall();
+            }
         });
 
+        // 2. Listen for Incoming Voice Calls
         function listenForCalls() {
-            onSnapshot(doc(db, 'incoming_calls', currentUser.uid), docSnap => {
-                if(docSnap.exists()) {
+            onSnapshot(doc(db, 'incoming_calls', currentUser.uid), (docSnap) => {
+                const incomingScreen = document.getElementById('incoming-call-screen');
+                const ringtone = document.getElementById('ringtone-audio');
+
+                if (docSnap.exists()) {
                     const data = docSnap.data();
-                    if(data.timestamp && Date.now() - data.timestamp.toMillis() > 60000) return;
-                    currentCallDocId = data.callDocId; document.getElementById('ring-caller-name').textContent = data.callerName; document.getElementById('ring-caller-pic').style.backgroundImage = `url('${data.callerPhoto}')`;
-                    document.getElementById('incoming-call-screen').classList.remove('hidden'); document.getElementById('incoming-call-screen').classList.add('flex'); document.getElementById('ringtone-audio').play().catch(()=>{});
+                    if (data.timestamp && Date.now() - data.timestamp.toMillis() > 60000) return;
+
+                    incomingCallData = data;
+                    currentCallDocId = data.callDocId;
+                    activeCallPartnerUid = data.callerUid;
+
+                    document.getElementById('ring-caller-name').textContent = data.callerName || "VEYRA User";
+                    document.getElementById('ring-caller-pic').style.backgroundImage = `url('${data.callerPhoto || ''}')`;
+                    incomingScreen.classList.remove('hidden');
+                    incomingScreen.classList.add('flex');
+                    ringtone.play().catch(() => {});
                 } else {
-                    document.getElementById('incoming-call-screen').classList.add('hidden'); document.getElementById('incoming-call-screen').classList.remove('flex'); document.getElementById('ringtone-audio').pause(); document.getElementById('ringtone-audio').currentTime = 0;
+                    incomingScreen.classList.add('hidden');
+                    incomingScreen.classList.remove('flex');
+                    ringtone.pause();
+                    ringtone.currentTime = 0;
                 }
             });
         }
 
+        // 3. Accept Incoming Voice Call
         document.getElementById('accept-call-btn').addEventListener('click', async () => {
-            document.getElementById('incoming-call-screen').classList.add('hidden'); document.getElementById('incoming-call-screen').classList.remove('flex'); document.getElementById('ringtone-audio').pause();
-            document.getElementById('active-call-screen').classList.remove('hidden'); document.getElementById('call-connecting-banner').classList.add('hidden');
-            deleteDoc(doc(db, 'incoming_calls', currentUser.uid)).catch(()=>{});
+            const incomingScreen = document.getElementById('incoming-call-screen');
+            const ringtone = document.getElementById('ringtone-audio');
+            incomingScreen.classList.add('hidden');
+            incomingScreen.classList.remove('flex');
+            ringtone.pause();
+            ringtone.currentTime = 0;
+
+            const callerName = incomingCallData?.callerName || "VEYRA User";
+            const callerPhoto = incomingCallData?.callerPhoto || "";
+            pendingIceCandidates = [];
+
+            showActiveCallUI(callerName, callerPhoto, "Connecting...");
+            deleteDoc(doc(db, 'incoming_calls', currentUser.uid)).catch(() => {});
 
             try {
-                localStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: { echoCancellation: true } });
-                document.getElementById('local-video').srcObject = localStream;
-                pc = new RTCPeerConnection(pcConfig); remoteStream = new MediaStream(); document.getElementById('remote-video').srcObject = remoteStream;
-                localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
-                pc.ontrack = event => event.streams[0].getTracks().forEach(track => remoteStream.addTrack(track));
+                localStream = await navigator.mediaDevices.getUserMedia({
+                    audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
+                    video: false
+                });
+
+                setupPeerConnectionAudio();
 
                 const callDoc = doc(db, 'calls', currentCallDocId);
-                pc.onicecandidate = event => { if(event.candidate) addDoc(collection(db, `calls/${currentCallDocId}/calleeCandidates`), event.candidate.toJSON()); };
-                const callData = (await getDoc(callDoc)).data();
-                if(!callData || !callData.offer) return endCall();
+                pc.onicecandidate = (event) => {
+                    if (event.candidate && currentCallDocId) {
+                        addDoc(collection(db, `calls/${currentCallDocId}/calleeCandidates`), event.candidate.toJSON()).catch(() => {});
+                    }
+                };
+
+                const callSnap = await getDoc(callDoc);
+                const callData = callSnap.data();
+                if (!callData || !callData.offer) return endCall();
+
                 await pc.setRemoteDescription(new RTCSessionDescription(callData.offer));
-                const answerDescription = await pc.createAnswer(); await pc.setLocalDescription(answerDescription);
+                const answerDescription = await pc.createAnswer();
+                await pc.setLocalDescription(answerDescription);
                 await updateDoc(callDoc, { answer: { type: answerDescription.type, sdp: answerDescription.sdp } });
 
-                callerIceUnsub = onSnapshot(collection(db, `calls/${currentCallDocId}/callerCandidates`), snapshot => { snapshot.docChanges().forEach(change => { if(change.type === 'added') pc.addIceCandidate(new RTCIceCandidate(change.doc.data())); }); });
-                callUnsub = onSnapshot(callDoc, snapshot => { if(!snapshot.exists()) endCall(); });
-            } catch(e) { console.error("Call Accept Error:", e); alert("Connection Error: " + (e.message || "Network timeout")); endCall(); }
+                await flushPendingIceCandidates();
+
+                callerIceUnsub = onSnapshot(collection(db, `calls/${currentCallDocId}/callerCandidates`), (snapshot) => {
+                    snapshot.docChanges().forEach((change) => {
+                        if (change.type === 'added') {
+                            const candData = change.doc.data();
+                            if (pc && pc.remoteDescription) {
+                                pc.addIceCandidate(new RTCIceCandidate(candData)).catch(() => {});
+                            } else {
+                                pendingIceCandidates.push(candData);
+                            }
+                        }
+                    });
+                });
+
+                callUnsub = onSnapshot(callDoc, (snapshot) => {
+                    if (!snapshot.exists()) endCall();
+                });
+            } catch (e) {
+                console.error("Voice Call Accept Error:", e);
+                alert("Voice Call Error: " + (e.message || "Could not access microphone."));
+                endCall();
+            }
         });
 
+        // 4. Decline Incoming Voice Call
         document.getElementById('decline-call-btn').addEventListener('click', () => {
-            if(currentCallDocId) deleteDoc(doc(db, 'calls', currentCallDocId)).catch(()=>{});
-            deleteDoc(doc(db, 'incoming_calls', currentUser.uid)).catch(()=>{});
-            document.getElementById('incoming-call-screen').classList.add('hidden'); document.getElementById('ringtone-audio').pause();
+            if (currentCallDocId) deleteDoc(doc(db, 'calls', currentCallDocId)).catch(() => {});
+            deleteDoc(doc(db, 'incoming_calls', currentUser.uid)).catch(() => {});
+            document.getElementById('incoming-call-screen').classList.add('hidden');
+            document.getElementById('incoming-call-screen').classList.remove('flex');
+            const ringtone = document.getElementById('ringtone-audio');
+            ringtone.pause();
+            ringtone.currentTime = 0;
+            currentCallDocId = null;
+            activeCallPartnerUid = null;
+            incomingCallData = null;
         });
 
+        // 5. End Voice Call & Full Hardware Cleanup
         function endCall() {
-            if(localStream) { localStream.getTracks().forEach(track => { track.stop(); track.enabled = false; }); document.getElementById('local-video').srcObject = null; localStream = null; }
-            if(remoteStream) { remoteStream.getTracks().forEach(track => track.stop()); document.getElementById('remote-video').srcObject = null; remoteStream = null; }
-            if(pc) { pc.close(); pc = null; }
-            if(callUnsub) callUnsub(); if(callerIceUnsub) callerIceUnsub(); if(calleeIceUnsub) calleeIceUnsub();
-            document.getElementById('active-call-screen').classList.add('hidden'); document.getElementById('incoming-call-screen').classList.add('hidden'); document.getElementById('ringtone-audio').pause();
-            
-            if(currentCallDocId) {
-                deleteDoc(doc(db, 'calls', currentCallDocId)).catch(()=>{}); deleteDoc(doc(db, 'incoming_calls', currentUser.uid)).catch(()=>{});
-                if(currentActiveChatUser) deleteDoc(doc(db, 'incoming_calls', currentActiveChatUser.uid)).catch(()=>{});
+            stopCallTimer();
+
+            if (localStream) {
+                localStream.getTracks().forEach(track => { track.stop(); track.enabled = false; });
+                localStream = null;
+            }
+            if (remoteStream) {
+                remoteStream.getTracks().forEach(track => track.stop());
+                document.getElementById('remote-audio').srcObject = null;
+                remoteStream = null;
+            }
+            if (pc) {
+                pc.onicecandidate = null;
+                pc.ontrack = null;
+                pc.onconnectionstatechange = null;
+                pc.close();
+                pc = null;
+            }
+            if (callUnsub) { callUnsub(); callUnsub = null; }
+            if (callerIceUnsub) { callerIceUnsub(); callerIceUnsub = null; }
+            if (calleeIceUnsub) { calleeIceUnsub(); calleeIceUnsub = null; }
+
+            pendingIceCandidates = [];
+
+            const activeScreen = document.getElementById('active-call-screen');
+            const incomingScreen = document.getElementById('incoming-call-screen');
+            activeScreen.classList.add('hidden');
+            activeScreen.classList.remove('flex');
+            incomingScreen.classList.add('hidden');
+            incomingScreen.classList.remove('flex');
+
+            const ringtone = document.getElementById('ringtone-audio');
+            ringtone.pause();
+            ringtone.currentTime = 0;
+
+            if (currentCallDocId) {
+                deleteDoc(doc(db, 'calls', currentCallDocId)).catch(() => {});
                 currentCallDocId = null;
             }
+            if (currentUser) {
+                deleteDoc(doc(db, 'incoming_calls', currentUser.uid)).catch(() => {});
+            }
+            if (activeCallPartnerUid) {
+                deleteDoc(doc(db, 'incoming_calls', activeCallPartnerUid)).catch(() => {});
+                activeCallPartnerUid = null;
+            }
+            incomingCallData = null;
         }
         document.getElementById('end-call-btn').addEventListener('click', endCall);
 
+        // 6. Mute / Unmute Mic Control
         document.getElementById('toggle-mic-btn').addEventListener('click', (e) => {
-            if(!localStream) return; const audioTrack = localStream.getAudioTracks()[0]; audioTrack.enabled = !audioTrack.enabled;
-            e.currentTarget.style.backgroundColor = audioTrack.enabled ? 'rgba(32, 44, 51, 0.8)' : 'rgba(220, 38, 38, 0.8)';
-        });
-        document.getElementById('toggle-cam-btn').addEventListener('click', (e) => {
-            if(!localStream) return; const videoTrack = localStream.getVideoTracks()[0]; videoTrack.enabled = !videoTrack.enabled;
-            e.currentTarget.style.backgroundColor = videoTrack.enabled ? 'rgba(32, 44, 51, 0.8)' : 'rgba(220, 38, 38, 0.8)';
+            if (!localStream) return;
+            const audioTrack = localStream.getAudioTracks()[0];
+            if (!audioTrack) return;
+            audioTrack.enabled = !audioTrack.enabled;
+            e.currentTarget.style.backgroundColor = audioTrack.enabled ? '#202C33' : 'rgba(220, 38, 38, 0.85)';
+            document.getElementById('mic-status-label').textContent = audioTrack.enabled ? 'Mute' : 'Muted';
         });
 
         // ==========================================
-        // LOCALSTORAGE AUTH BOOT (FIXED AVATAR)
+        // LOCALSTORAGE AUTH BOOT
         // ==========================================
         onAuthStateChanged(auth, async (user) => {
             if (user) {
@@ -494,38 +750,63 @@
                 try {
                     const userDoc = await getDoc(userDocRef);
                     if (userDoc.exists() && userDoc.data().username) {
-                        currentUserData = userDoc.data(); localStorage.setItem('veyra_username', currentUserData.username); bootMainApp();
+                        currentUserData = userDoc.data();
+                        localStorage.setItem('veyra_username', currentUserData.username);
+                        bootMainApp();
                     } else if (localStorage.getItem('veyra_username')) {
                         const savedUsername = localStorage.getItem('veyra_username');
                         const defaultAvatar = `https://ui-avatars.com/api/?name=${savedUsername}&background=202C33&color=25D366&size=200&font-size=0.5`;
                         currentUserData = { uid: user.uid, name: savedUsername, email: user.email || "", photoUrl: defaultAvatar, username: savedUsername, isPrivate: false };
-                        await setDoc(userDocRef, currentUserData, { merge: true }); bootMainApp();
-                    } else { showScreen('username'); }
-                } catch (error) { if(localStorage.getItem('veyra_username')) { bootMainApp(); } else { showScreen('username'); } }
-            } else { localStorage.removeItem('veyra_username'); showScreen('login'); }
+                        await setDoc(userDocRef, currentUserData, { merge: true });
+                        bootMainApp();
+                    } else {
+                        showScreen('username');
+                    }
+                } catch (error) {
+                    if (localStorage.getItem('veyra_username')) { bootMainApp(); }
+                    else { showScreen('username'); }
+                }
+            } else {
+                isAppBooted = false;
+                localStorage.removeItem('veyra_username');
+                showScreen('login');
+            }
         });
 
         function bootMainApp() {
-            setOnlineStatus(); 
-            document.getElementById('settings-name').textContent = currentUserData.name || "User"; document.getElementById('settings-username').textContent = "@" + currentUserData.username;
-            if(currentUserData.photoUrl) document.getElementById('settings-profile-pic').style.backgroundImage = `url('${currentUserData.photoUrl}')`;
+            setOnlineStatus();
+            document.getElementById('settings-name').textContent = currentUserData.name || "User";
+            document.getElementById('settings-username').textContent = "@" + currentUserData.username;
+            if (currentUserData.photoUrl) document.getElementById('settings-profile-pic').style.backgroundImage = `url('${currentUserData.photoUrl}')`;
             document.getElementById('private-account-toggle').checked = currentUserData.isPrivate === true;
-            showScreen('main'); loadInbox(); watchMyStats(); loadStoriesEngine(); listenForCalls(); loadActivityTab();
+            showScreen('main');
+
+            if (!isAppBooted) {
+                isAppBooted = true;
+                loadInbox();
+                watchMyStats();
+                listenForCalls();
+                loadActivityTab();
+            }
         }
 
         document.getElementById('save-username-btn').addEventListener('click', async () => {
             const rawUsername = document.getElementById('username-input').value.trim().toLowerCase();
-            if(rawUsername.length < 3) return alert("Please type a username first!");
+            if (rawUsername.length < 3) return alert("Please type a username (at least 3 characters).");
             const defaultAvatar = `https://ui-avatars.com/api/?name=${rawUsername}&background=202C33&color=25D366&size=200&font-size=0.5`;
             try {
                 const profileData = { uid: currentUser.uid, name: rawUsername, email: currentUser.email || "", photoUrl: defaultAvatar, username: rawUsername, isPrivate: false, joinedAt: serverTimestamp() };
-                localStorage.setItem('veyra_username', rawUsername); await setDoc(doc(db, "users", currentUser.uid), profileData, { merge: true });
-                currentUserData = profileData; bootMainApp();
+                localStorage.setItem('veyra_username', rawUsername);
+                await setDoc(doc(db, "users", currentUser.uid), profileData, { merge: true });
+                currentUserData = profileData;
+                bootMainApp();
             } catch (err) { alert("Database Error: " + err.message); }
         });
 
         document.getElementById('private-account-toggle').addEventListener('change', async (e) => {
-            const isPrivate = e.target.checked; await updateDoc(doc(db, "users", currentUser.uid), { isPrivate: isPrivate }).catch(()=>{}); if(currentUserData) currentUserData.isPrivate = isPrivate;
+            const isPrivate = e.target.checked;
+            await updateDoc(doc(db, "users", currentUser.uid), { isPrivate: isPrivate }).catch(() => {});
+            if (currentUserData) currentUserData.isPrivate = isPrivate;
         });
 
         function watchMyStats() {
@@ -538,119 +819,65 @@
         // ==========================================
         document.getElementById('delete-account-btn').addEventListener('click', async () => {
             const confirmDelete = confirm("Are you sure you want to permanently delete your VEYRA ID? This cannot be undone.");
-            if(confirmDelete) {
+            if (confirmDelete) {
                 try {
-                    // Wipe database record completely
                     await deleteDoc(doc(db, "users", currentUser.uid));
-                    // Delete Auth User
                     await deleteUser(currentUser);
-                    // Clear Local Storage
                     localStorage.clear();
                     alert("Your VEYRA account has been permanently deleted.");
                     window.location.reload();
-                } catch(error) {
+                } catch (error) {
                     alert("Security required: Please Log Out, Log back in, and try deleting again.");
                 }
             }
         });
 
         // ==========================================
-        // MUTUAL FOLLOWERS 24-HOUR STORIES ENGINE 
-        // ==========================================
-        let storyTimeoutObj;
-        async function loadStoriesEngine() {
-            const myFollowersSnap = await getDocs(collection(db, `users/${currentUser.uid}/followers`));
-            const myFollowingSnap = await getDocs(collection(db, `users/${currentUser.uid}/following`));
-            const followersList = new Set(); const mutuals = new Set();
-            myFollowersSnap.forEach(d => followersList.add(d.id));
-            myFollowingSnap.forEach(d => { if(followersList.has(d.id)) mutuals.add(d.id); });
-
-            onSnapshot(collection(db, 'stories'), (snapshot) => {
-                const storiesList = document.getElementById('stories-list'); storiesList.innerHTML = '';
-                let myActiveItems = []; let myStoryData = null; const now = Date.now(); const otherStories = [];
-
-                snapshot.forEach(docSnap => {
-                    const data = docSnap.data();
-                    const activeItems = data.items ? data.items.filter(s => now - s.timestamp < 24 * 60 * 60 * 1000) : [];
-                    if(data.uid === currentUser.uid) { 
-                        myActiveItems = activeItems; myStoryData = data; 
-                    } else if (mutuals.has(data.uid) && activeItems.length > 0) { 
-                        otherStories.push({ data, activeItems }); 
-                    }
-                });
-
-                const myDiv = document.createElement('div'); myDiv.className = "flex flex-col items-center gap-1 cursor-pointer flex-shrink-0 relative";
-                if(myActiveItems.length > 0) {
-                    myDiv.innerHTML = `<div class="w-14 h-14 rounded-full border-2 border-[#00A884] p-[2px] flex items-center justify-center"><div class="w-full h-full rounded-full bg-gray-600 bg-cover bg-center" style="background-image: url('${currentUserData.photoUrl || ''}')"></div></div><span class="text-xs text-white max-w-[60px] truncate">My Status</span>`;
-                    myDiv.onclick = () => viewStoryOverlay(myStoryData, myActiveItems);
-                } else {
-                    myDiv.innerHTML = `<div class="w-14 h-14 rounded-full border-2 border-dashed border-gray-500 flex items-center justify-center relative bg-[#202C33]"><div class="w-full h-full rounded-full bg-cover bg-center absolute top-0 left-0 opacity-40" style="background-image: url('${currentUserData.photoUrl || ''}')"></div><span class="text-[#25D366] text-2xl font-bold z-10 relative">+</span></div><span class="text-xs text-gray-400 max-w-[60px] truncate">Add Status</span>`;
-                    myDiv.onclick = () => document.getElementById('story-media-input').click();
-                }
-                storiesList.appendChild(myDiv);
-
-                otherStories.forEach(story => {
-                    const div = document.createElement('div'); div.className = "flex flex-col items-center gap-1 cursor-pointer flex-shrink-0";
-                    div.innerHTML = `<div class="w-14 h-14 rounded-full border-2 border-[#00A884] p-[2px] flex items-center justify-center"><div class="w-full h-full rounded-full bg-gray-600 bg-cover bg-center" style="background-image: url('${story.data.photoUrl || ''}')"></div></div><span class="text-xs text-white max-w-[60px] truncate">${story.data.name || story.data.username}</span>`;
-                    div.onclick = () => viewStoryOverlay(story.data, story.activeItems); storiesList.appendChild(div);
-                });
-            });
-        }
-
-        document.getElementById('story-media-input').addEventListener('change', async (e) => {
-            const file = e.target.files[0]; if(!file) return; e.target.value = ""; alert("Uploading story to your VEYRA network... Please wait a few seconds.");
-            try {
-                const formData = new FormData(); formData.append("image", file);
-                const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method: "POST", body: formData });
-                const data = await response.json();
-                if(data.success) {
-                    const downloadURL = data.data.url; const docRef = doc(db, 'stories', currentUser.uid); const docSnap = await getDoc(docRef);
-                    let userStories = []; const now = Date.now();
-                    if(docSnap.exists() && docSnap.data().items) { userStories = docSnap.data().items.filter(s => now - s.timestamp < 24 * 60 * 60 * 1000); }
-                    userStories.push({ url: downloadURL, timestamp: now });
-                    await setDoc(docRef, { uid: currentUser.uid, username: currentUserData.username, name: currentUserData.name || "User", photoUrl: currentUserData.photoUrl || "", items: userStories, lastUpdated: serverTimestamp() });
-                    alert("Story successfully posted! It will disappear in 24 hours.");
-                } else { alert("Story upload failed."); }
-            } catch(error) { alert("Upload error."); }
-        });
-
-        function viewStoryOverlay(userObj, items) {
-            const screen = document.getElementById('story-viewer-screen'); screen.classList.remove('hidden'); screen.classList.add('flex');
-            document.getElementById('story-viewer-pic').style.backgroundImage = `url('${userObj.photoUrl || ''}')`; document.getElementById('story-viewer-name').textContent = userObj.name || userObj.username;
-            let currentIndex = 0;
-            function showNextItem() {
-                if(currentIndex >= items.length) { closeStoryScreen(); return; }
-                document.getElementById('story-image-container').style.backgroundImage = `url('${items[currentIndex].url}')`;
-                const hoursAgo = Math.floor((Date.now() - items[currentIndex].timestamp) / (1000 * 60 * 60)); const minsAgo = Math.floor((Date.now() - items[currentIndex].timestamp) / (1000 * 60));
-                document.getElementById('story-viewer-time').textContent = hoursAgo > 0 ? `${hoursAgo}h ago` : (minsAgo > 0 ? `${minsAgo}m ago` : `Just now`);
-                clearTimeout(storyTimeoutObj); storyTimeoutObj = setTimeout(() => { currentIndex++; showNextItem(); }, 5000); 
-            }
-            showNextItem();
-        }
-
-        function closeStoryScreen() { clearTimeout(storyTimeoutObj); document.getElementById('story-viewer-screen').classList.add('hidden'); document.getElementById('story-viewer-screen').classList.remove('flex'); }
-        document.getElementById('close-story-btn').addEventListener('click', closeStoryScreen);
-
-        // ==========================================
-        // BUG FIX: PRIVATE ACCOUNT FOLLOW REQUESTS 
+        // ACTIVITY, CONNECTIONS & INBOX
         // ==========================================
         function loadActivityTab() {
             onSnapshot(collection(db, `users/${currentUser.uid}/activity`), (snapshot) => {
-                const list = document.getElementById('activity-list'); const badge = document.getElementById('activity-badge');
-                if(snapshot.empty) { badge.classList.add('hidden'); list.innerHTML = `<div class="p-4 text-center text-gray-500 text-sm mt-10">No new alerts.</div>`; return; }
-                badge.classList.remove('hidden'); list.innerHTML = "";
+                const list = document.getElementById('activity-list');
+                const badge = document.getElementById('activity-badge');
+                if (snapshot.empty) {
+                    badge.classList.add('hidden');
+                    list.innerHTML = `<div class="p-4 text-center text-gray-500 text-sm mt-10">No new alerts.</div>`;
+                    return;
+                }
+                badge.classList.remove('hidden');
+                list.innerHTML = "";
                 snapshot.forEach((docSnap) => {
-                    const req = docSnap.data(); const reqId = docSnap.id; const div = document.createElement('div'); div.className = "flex items-center gap-3 p-4 border-b border-[#202C33]/50 cursor-pointer";
+                    const req = docSnap.data();
+                    const reqId = docSnap.id;
+                    const div = document.createElement('div');
+                    div.className = "flex items-center gap-3 p-4 border-b border-[#202C33]/50 cursor-pointer";
                     if (req.type === 'follow_request') {
                         div.innerHTML = `<div class="w-10 h-10 bg-gray-600 rounded-full flex-shrink-0" style="background-image: url('${req.photoUrl || ''}'); background-size: cover;"></div><div class="flex-1"><p class="text-sm text-white"><span class="font-bold">${req.username || 'user'}</span> requested to follow you.</p></div><div class="flex gap-2"><button class="accept-btn bg-[#25D366] text-[#0B141A] font-bold px-3 py-1 rounded-lg text-xs hover:bg-[#1DA851]">Accept</button><button class="decline-btn bg-[#202C33] text-white font-bold px-3 py-1 rounded-lg text-xs hover:bg-red-600/30">Hide</button></div>`;
                         div.querySelector('.accept-btn').addEventListener('click', async (e) => {
-                            e.stopPropagation(); await setDoc(doc(db, `users/${currentUser.uid}/followers/${req.uid}`), { uid: req.uid, timestamp: serverTimestamp() }).catch(()=>{}); await setDoc(doc(db, `users/${req.uid}/following/${currentUser.uid}`), { uid: currentUser.uid, timestamp: serverTimestamp() }).catch(()=>{}); await deleteDoc(doc(db, `users/${currentUser.uid}/activity/${reqId}`)).catch(()=>{}); await setDoc(doc(db, `users/${req.uid}/activity/${currentUser.uid}_accept`), { type: 'started_following', uid: currentUser.uid, username: currentUserData.username || "user", photoUrl: currentUserData.photoUrl || "", timestamp: serverTimestamp() }).catch(()=>{});
+                            e.stopPropagation();
+                            await setDoc(doc(db, `users/${currentUser.uid}/followers/${req.uid}`), { uid: req.uid, timestamp: serverTimestamp() }).catch(() => {});
+                            await setDoc(doc(db, `users/${req.uid}/following/${currentUser.uid}`), { uid: currentUser.uid, timestamp: serverTimestamp() }).catch(() => {});
+                            await deleteDoc(doc(db, `users/${currentUser.uid}/activity/${reqId}`)).catch(() => {});
+                            await setDoc(doc(db, `users/${req.uid}/activity/${currentUser.uid}_accept`), { type: 'started_following', uid: currentUser.uid, username: currentUserData.username || "user", photoUrl: currentUserData.photoUrl || "", timestamp: serverTimestamp() }).catch(() => {});
                         });
-                        div.querySelector('.decline-btn').addEventListener('click', async (e) => { e.stopPropagation(); await deleteDoc(doc(db, `users/${currentUser.uid}/activity/${reqId}`)); });
+                        div.querySelector('.decline-btn').addEventListener('click', async (e) => {
+                            e.stopPropagation();
+                            await deleteDoc(doc(db, `users/${currentUser.uid}/activity/${reqId}`));
+                        });
                     } else if (req.type === 'started_following') {
-                        div.innerHTML = `<div class="w-10 h-10 bg-gray-600 rounded-full flex-shrink-0" style="background-image: url('${req.photoUrl || ''}'); background-size: cover;"></div><div class="flex-1"><p class="text-sm text-white"><span class="font-bold">${req.username || 'user'}</span> started following you.</p></div>`; div.addEventListener('click', async () => { await deleteDoc(doc(db, `users/${currentUser.uid}/activity/${reqId}`)); const u = await getDoc(doc(db, "users", req.uid)); if(u.exists()) openProfileScreen(u.data()); });
+                        div.innerHTML = `<div class="w-10 h-10 bg-gray-600 rounded-full flex-shrink-0" style="background-image: url('${req.photoUrl || ''}'); background-size: cover;"></div><div class="flex-1"><p class="text-sm text-white"><span class="font-bold">${req.username || 'user'}</span> started following you.</p></div>`;
+                        div.addEventListener('click', async () => {
+                            await deleteDoc(doc(db, `users/${currentUser.uid}/activity/${reqId}`));
+                            const u = await getDoc(doc(db, "users", req.uid));
+                            if (u.exists()) openProfileScreen(u.data());
+                        });
                     } else if (req.type === 'new_message') {
-                        div.innerHTML = `<div class="w-10 h-10 bg-gray-600 rounded-full flex-shrink-0" style="background-image: url('${req.photoUrl || ''}'); background-size: cover;"></div><div class="flex-1"><p class="text-sm text-white"><span class="font-bold">${req.username || 'user'}</span> sent you a message.</p></div>`; div.addEventListener('click', async () => { await deleteDoc(doc(db, `users/${currentUser.uid}/activity/${reqId}`)); const u = await getDoc(doc(db, "users", req.uid)); if(u.exists()) openPrivateChat(u.data()); });
+                        div.innerHTML = `<div class="w-10 h-10 bg-gray-600 rounded-full flex-shrink-0" style="background-image: url('${req.photoUrl || ''}'); background-size: cover;"></div><div class="flex-1"><p class="text-sm text-white"><span class="font-bold">${req.username || 'user'}</span> sent you a message.</p></div>`;
+                        div.addEventListener('click', async () => {
+                            await deleteDoc(doc(db, `users/${currentUser.uid}/activity/${reqId}`));
+                            const u = await getDoc(doc(db, "users", req.uid));
+                            if (u.exists()) openPrivateChat(u.data());
+                        });
                     }
                     list.appendChild(div);
                 });
@@ -658,17 +885,25 @@
         }
 
         async function openConnectionsList(targetUid, typeTitle) {
-            document.getElementById('connections-header-title').textContent = typeTitle; showScreen('connections');
-            const listArea = document.getElementById('connections-list-area'); listArea.innerHTML = `<div class="p-4 text-center text-gray-500 text-sm">Loading...</div>`;
+            document.getElementById('connections-header-title').textContent = typeTitle;
+            showScreen('connections');
+            const listArea = document.getElementById('connections-list-area');
+            listArea.innerHTML = `<div class="p-4 text-center text-gray-500 text-sm">Loading...</div>`;
             const snap = await getDocs(collection(db, `users/${targetUid}/${typeTitle.toLowerCase()}`));
-            if(snap.empty) { listArea.innerHTML = `<div class="p-4 text-center text-gray-500 text-sm">No ${typeTitle.toLowerCase()} yet.</div>`; return; }
+            if (snap.empty) {
+                listArea.innerHTML = `<div class="p-4 text-center text-gray-500 text-sm">No ${typeTitle.toLowerCase()} yet.</div>`;
+                return;
+            }
             listArea.innerHTML = "";
             snap.forEach(async (docSnap) => {
                 const uDoc = await getDoc(doc(db, "users", docSnap.id));
-                if(uDoc.exists()) {
-                    const u = uDoc.data(); const div = document.createElement('div'); div.className = "flex items-center gap-3 p-3 border-b border-[#202C33]/50 hover:bg-[#202C33] cursor-pointer";
+                if (uDoc.exists()) {
+                    const u = uDoc.data();
+                    const div = document.createElement('div');
+                    div.className = "flex items-center gap-3 p-3 border-b border-[#202C33]/50 hover:bg-[#202C33] cursor-pointer";
                     div.innerHTML = `<div class="w-10 h-10 bg-gray-600 rounded-full flex-shrink-0" style="background-image: url('${u.photoUrl || ''}'); background-size: cover;"></div><div><h4 class="text-white text-sm truncate">${u.name || "User"}</h4><p class="text-xs text-gray-400">@${u.username}</p></div>`;
-                    div.addEventListener('click', () => openProfileScreen(u)); listArea.appendChild(div);
+                    div.addEventListener('click', () => openProfileScreen(u));
+                    listArea.appendChild(div);
                 }
             });
         }
@@ -681,216 +916,383 @@
             const q = query(collection(db, `users/${currentUser.uid}/inbox`), orderBy("timestamp", "desc"));
             onSnapshot(q, (snapshot) => {
                 const list = document.getElementById('recent-chats-list');
-                if(snapshot.empty) { list.innerHTML = `<div class="p-4 text-center text-gray-500 text-sm mt-10">Search a username above to connect with people!</div>`; return; }
+                if (snapshot.empty) {
+                    list.innerHTML = `<div class="p-4 text-center text-gray-500 text-sm mt-10">Search a username above to connect with people!</div>`;
+                    return;
+                }
                 list.innerHTML = "";
                 snapshot.forEach((docSnap) => {
-                    const chat = docSnap.data(); const unreadBadge = (!chat.isRead && chat.lastSenderId !== currentUser.uid) ? `<div class="w-3 h-3 bg-[#25D366] rounded-full shadow-lg"></div>` : '';
-                    const div = document.createElement('div'); div.className = "flex items-center gap-4 px-4 py-3 hover:bg-[#202C33] cursor-pointer border-b border-[#202C33]/50";
-                    div.innerHTML = `<div class="w-12 h-12 bg-gray-600 rounded-full flex-shrink-0 avatar-btn" style="background-image: url('${chat.photoUrl || ''}'); background-size: cover;"></div><div class="flex-1 flex flex-col justify-center overflow-hidden chat-btn"><div class="flex justify-between items-center"><h2 class="text-lg font-normal text-white truncate">${chat.name || "User"}</h2>${unreadBadge}</div><div class="flex justify-between items-center"><p class="text-sm ${unreadBadge ? 'text-white font-medium' : 'text-gray-400'} truncate">${chat.lastMessage || ('@' + chat.username)}</p></div></div>`;
+                    const chat = docSnap.data();
+                    const unreadBadge = (!chat.isRead && chat.lastSenderId !== currentUser.uid) ? `<div class="w-3 h-3 bg-[#25D366] rounded-full shadow-lg"></div>` : '';
+                    const div = document.createElement('div');
+                    div.className = "flex items-center gap-4 px-4 py-3 hover:bg-[#202C33] cursor-pointer border-b border-[#202C33]/50";
+                    div.innerHTML = `<div class="w-12 h-12 bg-gray-600 rounded-full flex-shrink-0 avatar-btn border border-[#202C33]" style="background-image: url('${chat.photoUrl || ''}'); background-size: cover;"></div><div class="flex-1 flex flex-col justify-center overflow-hidden chat-btn"><div class="flex justify-between items-center"><h2 class="text-lg font-normal text-white truncate">${chat.name || "User"}</h2>${unreadBadge}</div><div class="flex justify-between items-center"><p class="text-sm ${unreadBadge ? 'text-white font-medium' : 'text-gray-400'} truncate">${chat.lastMessage || ('@' + chat.username)}</p></div></div>`;
                     div.querySelector('.avatar-btn').addEventListener('click', (e) => { e.stopPropagation(); openProfileScreen(chat); });
-                    div.querySelector('.chat-btn').addEventListener('click', () => { localStorage.setItem('veyra_active_user', JSON.stringify(chat)); openPrivateChat(chat); }); 
+                    div.querySelector('.chat-btn').addEventListener('click', () => { localStorage.setItem('veyra_active_user', JSON.stringify(chat)); openPrivateChat(chat); });
                     list.appendChild(div);
                 });
             });
         }
 
-        document.getElementById('logout-btn').addEventListener('click', () => { localStorage.clear(); signOut(auth).then(() => window.location.reload()); });
-        
-        const searchInput = document.getElementById('search-users-input'); const searchResults = document.getElementById('search-results');
-        searchInput.addEventListener('input', async (e) => {
-            const val = e.target.value.trim().toLowerCase(); if(val.length < 2) { searchResults.classList.add('hidden'); return; }
-            const q = query(collection(db, "users"), where("username", ">=", val), where("username", "<=", val + '\uf8ff'));
-            const querySnapshot = await getDocs(q); searchResults.innerHTML = ""; let found = false;
-            querySnapshot.forEach((docSnap) => {
-                const userObj = docSnap.data(); if(userObj.uid === currentUser.uid) return; found = true;
-                const div = document.createElement('div'); div.className = "flex items-center gap-3 p-2 hover:bg-[#2A3942] rounded-lg cursor-pointer";
-                div.innerHTML = `<div class="w-10 h-10 bg-gray-600 rounded-full flex-shrink-0" style="background-image: url('${userObj.photoUrl || ''}'); background-size: cover;"></div><div><h4 class="text-white text-sm truncate">${userObj.name || "User"}</h4><p class="text-xs text-gray-400">@${userObj.username} ${userObj.isPrivate ? '🔒' : ''}</p></div>`;
-                div.addEventListener('click', () => { searchInput.value = ""; searchResults.classList.add('hidden'); openProfileScreen(userObj); }); searchResults.appendChild(div);
-            });
-            if(!found) searchResults.innerHTML = `<div class="p-2 text-gray-400 text-sm">No users found</div>`; searchResults.classList.remove('hidden');
+        document.getElementById('logout-btn').addEventListener('click', () => {
+            localStorage.clear();
+            signOut(auth).then(() => window.location.reload());
         });
-        document.addEventListener('click', (e) => { if(e.target !== searchInput) searchResults.classList.add('hidden'); });
+        
+        const searchInput = document.getElementById('search-users-input');
+        const searchResults = document.getElementById('search-results');
+        searchInput.addEventListener('input', async (e) => {
+            const val = e.target.value.trim().toLowerCase();
+            if (val.length < 2) { searchResults.classList.add('hidden'); return; }
+            const q = query(collection(db, "users"), where("username", ">=", val), where("username", "<=", val + '\uf8ff'));
+            const querySnapshot = await getDocs(q);
+            searchResults.innerHTML = "";
+            let found = false;
+            querySnapshot.forEach((docSnap) => {
+                const userObj = docSnap.data();
+                if (userObj.uid === currentUser.uid) return;
+                found = true;
+                const div = document.createElement('div');
+                div.className = "flex items-center gap-3 p-2 hover:bg-[#2A3942] rounded-lg cursor-pointer";
+                div.innerHTML = `<div class="w-10 h-10 bg-gray-600 rounded-full flex-shrink-0 border border-[#202C33]" style="background-image: url('${userObj.photoUrl || ''}'); background-size: cover;"></div><div><h4 class="text-white text-sm truncate">${userObj.name || "User"}</h4><p class="text-xs text-gray-400">@${userObj.username} ${userObj.isPrivate ? '🔒' : ''}</p></div>`;
+                div.addEventListener('click', () => { searchInput.value = ""; searchResults.classList.add('hidden'); openProfileScreen(userObj); });
+                searchResults.appendChild(div);
+            });
+            if (!found) searchResults.innerHTML = `<div class="p-2 text-gray-400 text-sm">No users found</div>`;
+            searchResults.classList.remove('hidden');
+        });
+        document.addEventListener('click', (e) => { if (e.target !== searchInput) searchResults.classList.add('hidden'); });
+
+        function updateFollowButtonUI() {
+            const followBtn = document.getElementById('profile-follow-btn');
+            if (isFollowingTarget) {
+                followBtn.textContent = "Following";
+                followBtn.className = "flex-1 bg-[#202C33] text-white font-bold py-2 rounded-lg transition-colors";
+            } else if (hasRequestedTarget) {
+                followBtn.textContent = "Requested";
+                followBtn.className = "flex-1 bg-[#202C33] text-white font-bold py-2 rounded-lg transition-colors opacity-70";
+            } else {
+                followBtn.textContent = "Follow";
+                followBtn.className = "flex-1 bg-[#25D366] text-[#0B141A] font-bold py-2 rounded-lg transition-colors hover:bg-[#1DA851]";
+            }
+        }
 
         async function openProfileScreen(targetUser) {
-            viewingProfileUser = targetUser; document.getElementById('profile-header-username').textContent = "@" + targetUser.username; document.getElementById('profile-page-name').textContent = targetUser.name || "User";
-            if(targetUser.photoUrl) document.getElementById('profile-page-pic').style.backgroundImage = `url('${targetUser.photoUrl}')`; showScreen('profile');
-            const privateWarning = document.getElementById('profile-private-warning'); const msgBtn = document.getElementById('profile-message-btn'); const followBtn = document.getElementById('profile-follow-btn');
+            if (!targetUser || !targetUser.uid) return;
+            viewingProfileUser = targetUser;
+            document.getElementById('profile-header-username').textContent = "@" + targetUser.username;
+            document.getElementById('profile-page-name').textContent = targetUser.name || "User";
+            if (targetUser.photoUrl) document.getElementById('profile-page-pic').style.backgroundImage = `url('${targetUser.photoUrl}')`;
+            showScreen('profile');
 
-            onSnapshot(collection(db, `users/${targetUser.uid}/followers`), async (snap) => {
-                isFollowingTarget = false; snap.forEach(doc => { if(doc.id === currentUser.uid) isFollowingTarget = true; });
-                const reqDoc = await getDoc(doc(db, `users/${targetUser.uid}/activity/${currentUser.uid}`)); hasRequestedTarget = reqDoc.exists();
+            const privateWarning = document.getElementById('profile-private-warning');
+            const msgBtn = document.getElementById('profile-message-btn');
+
+            if (profileFollowersUnsub) profileFollowersUnsub();
+            if (profileFollowingUnsub) profileFollowingUnsub();
+
+            profileFollowersUnsub = onSnapshot(collection(db, `users/${targetUser.uid}/followers`), async (snap) => {
+                isFollowingTarget = false;
+                snap.forEach(d => { if (d.id === currentUser.uid) isFollowingTarget = true; });
+                const reqDoc = await getDoc(doc(db, `users/${targetUser.uid}/activity/${currentUser.uid}`));
+                hasRequestedTarget = reqDoc.exists();
 
                 if (targetUser.isPrivate && !isFollowingTarget) {
-                    document.getElementById('profile-followers-count').textContent = "🔒"; document.getElementById('profile-following-count').textContent = "🔒"; document.getElementById('profile-followers-btn').onclick = null; document.getElementById('profile-following-btn').onclick = null; privateWarning.classList.remove('hidden'); msgBtn.classList.add('hidden');
+                    document.getElementById('profile-followers-count').textContent = "🔒";
+                    document.getElementById('profile-following-count').textContent = "🔒";
+                    document.getElementById('profile-followers-btn').onclick = null;
+                    document.getElementById('profile-following-btn').onclick = null;
+                    privateWarning.classList.remove('hidden');
+                    msgBtn.classList.add('hidden');
                 } else {
-                    document.getElementById('profile-followers-count').textContent = snap.size; privateWarning.classList.add('hidden'); msgBtn.classList.remove('hidden'); document.getElementById('profile-followers-btn').onclick = () => openConnectionsList(targetUser.uid, 'Followers'); document.getElementById('profile-following-btn').onclick = () => openConnectionsList(targetUser.uid, 'Following');
+                    document.getElementById('profile-followers-count').textContent = snap.size;
+                    privateWarning.classList.add('hidden');
+                    msgBtn.classList.remove('hidden');
+                    document.getElementById('profile-followers-btn').onclick = () => openConnectionsList(targetUser.uid, 'Followers');
+                    document.getElementById('profile-following-btn').onclick = () => openConnectionsList(targetUser.uid, 'Following');
                 }
-                
-                if (isFollowingTarget) { followBtn.textContent = "Following"; followBtn.className = "flex-1 bg-[#202C33] text-white font-bold py-2 rounded-lg transition-colors"; } 
-                else if (hasRequestedTarget) { followBtn.textContent = "Requested"; followBtn.className = "flex-1 bg-[#202C33] text-white font-bold py-2 rounded-lg transition-colors opacity-70"; } 
-                else { followBtn.textContent = "Follow"; followBtn.className = "flex-1 bg-[#25D366] text-[#0B141A] font-bold py-2 rounded-lg transition-colors hover:bg-[#1DA851]"; }
+                updateFollowButtonUI();
             });
-            onSnapshot(collection(db, `users/${targetUser.uid}/following`), (snap) => { if(!targetUser.isPrivate || isFollowingTarget) document.getElementById('profile-following-count').textContent = snap.size; });
+
+            profileFollowingUnsub = onSnapshot(collection(db, `users/${targetUser.uid}/following`), (snap) => {
+                if (!targetUser.isPrivate || isFollowingTarget) {
+                    document.getElementById('profile-following-count').textContent = snap.size;
+                }
+            });
         }
 
         document.getElementById('profile-follow-btn').addEventListener('click', async () => {
-            if(!viewingProfileUser) return; const targetId = viewingProfileUser.uid;
-            
-            // BUG FIX: Actually push the follow request to the target user's activity tab
-            if (isFollowingTarget) { 
-                await deleteDoc(doc(db, `users/${targetId}/followers/${currentUser.uid}`)); await deleteDoc(doc(db, `users/${currentUser.uid}/following/${targetId}`)); 
-            } else if (hasRequestedTarget) { 
-                await deleteDoc(doc(db, `users/${targetId}/activity/${currentUser.uid}`)); hasRequestedTarget = false; 
+            if (!viewingProfileUser) return;
+            const targetId = viewingProfileUser.uid;
+            if (isFollowingTarget) {
+                await deleteDoc(doc(db, `users/${targetId}/followers/${currentUser.uid}`));
+                await deleteDoc(doc(db, `users/${currentUser.uid}/following/${targetId}`));
+            } else if (hasRequestedTarget) {
+                await deleteDoc(doc(db, `users/${targetId}/activity/${currentUser.uid}`));
+                hasRequestedTarget = false;
+                updateFollowButtonUI();
             } else {
-                if (viewingProfileUser.isPrivate) { 
-                    // Send Private Request
-                    await setDoc(doc(db, `users/${targetId}/activity/${currentUser.uid}`), { 
-                        type: 'follow_request', uid: currentUser.uid, username: currentUserData.username, 
-                        name: currentUserData.name || "User", photoUrl: currentUserData.photoUrl || "", timestamp: serverTimestamp() 
-                    }).catch(()=>{}); 
-                    hasRequestedTarget = true; 
-                } else { 
-                    // Auto-Follow Public Account
-                    await setDoc(doc(db, `users/${targetId}/followers/${currentUser.uid}`), { uid: currentUser.uid, timestamp: serverTimestamp() }).catch(()=>{}); 
-                    await setDoc(doc(db, `users/${currentUser.uid}/following/${targetId}`), { uid: targetId, timestamp: serverTimestamp() }).catch(()=>{}); 
-                    await setDoc(doc(db, `users/${targetId}/activity/${currentUser.uid}_follow`), { type: 'started_following', uid: currentUser.uid, username: currentUserData.username, photoUrl: currentUserData.photoUrl || "", timestamp: serverTimestamp() }).catch(()=>{}); 
+                if (viewingProfileUser.isPrivate) {
+                    await setDoc(doc(db, `users/${targetId}/activity/${currentUser.uid}`), {
+                        type: 'follow_request',
+                        uid: currentUser.uid,
+                        username: currentUserData.username,
+                        name: currentUserData.name || "User",
+                        photoUrl: currentUserData.photoUrl || "",
+                        timestamp: serverTimestamp()
+                    }).catch(() => {});
+                    hasRequestedTarget = true;
+                    updateFollowButtonUI();
+                } else {
+                    await setDoc(doc(db, `users/${targetId}/followers/${currentUser.uid}`), { uid: currentUser.uid, timestamp: serverTimestamp() }).catch(() => {});
+                    await setDoc(doc(db, `users/${currentUser.uid}/following/${targetId}`), { uid: targetId, timestamp: serverTimestamp() }).catch(() => {});
+                    await setDoc(doc(db, `users/${targetId}/activity/${currentUser.uid}_follow`), { type: 'started_following', uid: currentUser.uid, username: currentUserData.username, photoUrl: currentUserData.photoUrl || "", timestamp: serverTimestamp() }).catch(() => {});
                 }
             }
         });
 
-        document.getElementById('profile-message-btn').addEventListener('click', () => { localStorage.setItem('veyra_active_user', JSON.stringify(viewingProfileUser)); openPrivateChat(viewingProfileUser); });
+        document.getElementById('profile-message-btn').addEventListener('click', () => {
+            localStorage.setItem('veyra_active_user', JSON.stringify(viewingProfileUser));
+            openPrivateChat(viewingProfileUser);
+        });
         document.getElementById('profile-back-btn').addEventListener('click', () => showScreen('main'));
 
+        // ==========================================
+        // PRIVATE CHAT ENGINE
+        // ==========================================
         function openPrivateChat(otherUser) {
-            if(!otherUser || !otherUser.uid) return; currentActiveChatUser = otherUser; 
-            const uids = [currentUser.uid, otherUser.uid].sort(); activeChatId = `${uids[0]}_${uids[1]}`;
+            if (!otherUser || !otherUser.uid) return;
+            currentActiveChatUser = otherUser;
+            const uids = [currentUser.uid, otherUser.uid].sort();
+            activeChatId = `${uids[0]}_${uids[1]}`;
+
             document.getElementById('chat-header-name').textContent = otherUser.name || "User";
-            const statusEl = document.getElementById('chat-header-status'); statusEl.textContent = "@" + otherUser.username; statusEl.classList.remove('text-[#25D366]'); statusEl.classList.add('text-gray-400');
-            if(otherUser.photoUrl) document.getElementById('chat-header-pic').style.backgroundImage = `url('${otherUser.photoUrl}')`;
-            setDoc(doc(db, `users/${currentUser.uid}/inbox/${otherUser.uid}`), { isRead: true }, {merge: true}).catch(e=>{}); showScreen('chat');
+            const statusEl = document.getElementById('chat-header-status');
+            statusEl.textContent = "@" + otherUser.username;
+            statusEl.classList.remove('text-[#25D366]');
+            statusEl.classList.add('text-gray-400');
+            if (otherUser.photoUrl) document.getElementById('chat-header-pic').style.backgroundImage = `url('${otherUser.photoUrl}')`;
+
+            setDoc(doc(db, `users/${currentUser.uid}/inbox/${otherUser.uid}`), { isRead: true }, { merge: true }).catch(() => {});
+            showScreen('chat');
             
-            if(typingListener) typingListener(); if(userStatusListener) userStatusListener();
-            if(currentChatListener) currentChatListener();
+            if (typingListener) typingListener();
+            if (userStatusListener) userStatusListener();
+            if (currentChatListener) currentChatListener();
             
             userStatusListener = onSnapshot(doc(db, "users", otherUser.uid), (docSnap) => {
-                if(!docSnap.exists()) return; const data = docSnap.data();
-                if(data.lastActive) {
+                if (!docSnap.exists()) return;
+                const data = docSnap.data();
+                if (data.lastActive) {
                     const diff = Date.now() - data.lastActive.toMillis();
-                    if(diff < 120000 && statusEl.textContent !== 'typing...') { statusEl.textContent = "Online"; statusEl.classList.add('text-[#25D366]'); statusEl.classList.remove('text-gray-400'); } 
-                    else if (statusEl.textContent !== 'typing...') { statusEl.textContent = "@" + otherUser.username; statusEl.classList.remove('text-[#25D366]'); statusEl.classList.add('text-gray-400'); }
+                    if (diff < 120000 && statusEl.textContent !== 'typing...') {
+                        statusEl.textContent = "Online";
+                        statusEl.classList.add('text-[#25D366]');
+                        statusEl.classList.remove('text-gray-400');
+                    } else if (statusEl.textContent !== 'typing...') {
+                        statusEl.textContent = "@" + otherUser.username;
+                        statusEl.classList.remove('text-[#25D366]');
+                        statusEl.classList.add('text-gray-400');
+                    }
                 }
             });
 
             typingListener = onSnapshot(doc(db, "chats", activeChatId), (docSnap) => {
-                if(docSnap.exists()) {
+                if (docSnap.exists()) {
                     const data = docSnap.data();
-                    if(data.typing && data.typing[otherUser.uid] === true) { statusEl.textContent = "typing..."; statusEl.classList.add('text-[#25D366]'); statusEl.classList.remove('text-gray-400'); } 
-                    else { if(statusEl.textContent === 'typing...') statusEl.textContent = "Online"; }
+                    if (data.typing && data.typing[otherUser.uid] === true) {
+                        statusEl.textContent = "typing...";
+                        statusEl.classList.add('text-[#25D366]');
+                        statusEl.classList.remove('text-gray-400');
+                    } else if (statusEl.textContent === 'typing...') {
+                        statusEl.textContent = "Online";
+                    }
                 }
             });
             loadPrivateMessages();
         }
 
-        const msgInputEl = document.getElementById('message-input'); const sendBtnEl = document.getElementById('send-btn'); const micBtnEl = document.getElementById('mic-btn');
+        const msgInputEl = document.getElementById('message-input');
+        const sendBtnEl = document.getElementById('send-btn');
+        const micBtnEl = document.getElementById('mic-btn');
         let typingTimeout = null;
+
         msgInputEl.addEventListener('input', () => {
-            if(!activeChatId || !currentUser) return;
-            if(msgInputEl.value.trim().length > 0) { sendBtnEl.classList.remove('hidden'); micBtnEl.classList.add('hidden'); } else { sendBtnEl.classList.add('hidden'); micBtnEl.classList.remove('hidden'); }
-            setDoc(doc(db, "chats", activeChatId), { typing: { [currentUser.uid]: true } }, { merge: true }).catch(()=>{});
-            clearTimeout(typingTimeout); typingTimeout = setTimeout(() => { setDoc(doc(db, "chats", activeChatId), { typing: { [currentUser.uid]: false } }, { merge: true }).catch(()=>{}); }, 2000);
+            if (!activeChatId || !currentUser) return;
+            if (msgInputEl.value.trim().length > 0) {
+                sendBtnEl.classList.remove('hidden');
+                micBtnEl.classList.add('hidden');
+            } else {
+                sendBtnEl.classList.add('hidden');
+                micBtnEl.classList.remove('hidden');
+            }
+            setDoc(doc(db, "chats", activeChatId), { typing: { [currentUser.uid]: true } }, { merge: true }).catch(() => {});
+            clearTimeout(typingTimeout);
+            typingTimeout = setTimeout(() => {
+                setDoc(doc(db, "chats", activeChatId), { typing: { [currentUser.uid]: false } }, { merge: true }).catch(() => {});
+            }, 2000);
         });
 
-        let mediaRecorder; let audioChunks = []; let isRecording = false;
+        let mediaRecorder;
+        let audioChunks = [];
+        let isRecording = false;
         micBtnEl.addEventListener('click', async () => {
             if (!activeChatId || !currentActiveChatUser) return;
             if (!isRecording) {
                 try {
                     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                    mediaRecorder = new MediaRecorder(stream); audioChunks = []; mediaRecorder.ondataavailable = e => { if (e.data.size > 0) audioChunks.push(e.data); };
+                    mediaRecorder = new MediaRecorder(stream);
+                    audioChunks = [];
+                    mediaRecorder.ondataavailable = e => { if (e.data.size > 0) audioChunks.push(e.data); };
                     mediaRecorder.onstop = async () => {
-                        const uploadingBanner = document.getElementById('uploading-banner'); uploadingBanner.textContent = "Sending voice note..."; uploadingBanner.classList.remove('hidden');
+                        const uploadingBanner = document.getElementById('uploading-banner');
+                        uploadingBanner.textContent = "Sending voice note...";
+                        uploadingBanner.classList.remove('hidden');
                         
-                        const audioBlob = new Blob(audioChunks); 
-                        const formData = new FormData(); formData.append('file', audioBlob); formData.append('upload_preset', CLOUDINARY_PRESET);
+                        const audioBlob = new Blob(audioChunks);
+                        const formData = new FormData();
+                        formData.append('file', audioBlob);
+                        formData.append('upload_preset', CLOUDINARY_PRESET);
                         
                         try {
-                            const res = await fetch(CLOUDINARY_URL, { method: 'POST', body: formData }); const data = await res.json();
-                            if(data.secure_url) {
-                                const timerEl = document.getElementById('disappearing-timer'); const timer = timerEl ? timerEl.value : "off";
+                            const res = await fetch(CLOUDINARY_URL, { method: 'POST', body: formData });
+                            const data = await res.json();
+                            if (data.secure_url) {
+                                const timerEl = document.getElementById('disappearing-timer');
+                                const timer = timerEl ? timerEl.value : "off";
                                 await addDoc(collection(db, `chats/${activeChatId}/messages`), { text: "", mediaUrl: data.secure_url, mediaType: 'audio', senderUid: currentUser.uid, timer: timer, isRead: false, timestamp: serverTimestamp() });
-                                await setDoc(doc(db, `users/${currentUser.uid}/inbox/${currentActiveChatUser.uid}`), { uid: currentActiveChatUser.uid, name: currentActiveChatUser.name || "User", username: currentActiveChatUser.username, photoUrl: currentActiveChatUser.photoUrl || "", lastMessage: "🎤 Voice Note", lastSenderId: currentUser.uid, isRead: true, timestamp: serverTimestamp() }, {merge: true});
-                                await setDoc(doc(db, `users/${currentActiveChatUser.uid}/inbox/${currentUser.uid}`), { uid: currentUser.uid, name: currentUserData.name || "User", username: currentUserData.username, photoUrl: currentUserData.photoUrl || "", lastMessage: "🎤 Voice Note", lastSenderId: currentUser.uid, isRead: false, timestamp: serverTimestamp() }, {merge: true});
+                                await setDoc(doc(db, `users/${currentUser.uid}/inbox/${currentActiveChatUser.uid}`), { uid: currentActiveChatUser.uid, name: currentActiveChatUser.name || "User", username: currentActiveChatUser.username, photoUrl: currentActiveChatUser.photoUrl || "", lastMessage: "🎤 Voice Note", lastSenderId: currentUser.uid, isRead: true, timestamp: serverTimestamp() }, { merge: true });
+                                await setDoc(doc(db, `users/${currentActiveChatUser.uid}/inbox/${currentUser.uid}`), { uid: currentUser.uid, name: currentUserData.name || "User", username: currentUserData.username, photoUrl: currentUserData.photoUrl || "", lastMessage: "🎤 Voice Note", lastSenderId: currentUser.uid, isRead: false, timestamp: serverTimestamp() }, { merge: true });
                                 await setDoc(doc(db, `users/${currentActiveChatUser.uid}/activity/${currentUser.uid}_msg`), { type: 'new_message', uid: currentUser.uid, username: currentUserData.username, photoUrl: currentUserData.photoUrl || "", timestamp: serverTimestamp() });
                             }
-                        } catch (err) { alert('Voice note upload failed.'); } finally { uploadingBanner.classList.add('hidden'); uploadingBanner.textContent = "Processing media..."; }
+                        } catch (err) { alert('Voice note upload failed.'); }
+                        finally { uploadingBanner.classList.add('hidden'); uploadingBanner.textContent = "Processing media..."; }
                     };
-                    mediaRecorder.start(); isRecording = true; micBtnEl.classList.remove('bg-[#00A884]'); micBtnEl.classList.add('bg-red-600', 'animate-pulse'); micBtnEl.innerHTML = '<span class="text-white text-xl">⏹</span>';
+                    mediaRecorder.start();
+                    isRecording = true;
+                    micBtnEl.classList.remove('bg-[#00A884]');
+                    micBtnEl.classList.add('bg-red-600', 'animate-pulse');
+                    micBtnEl.innerHTML = '<span class="text-white text-xl">⏹</span>';
                 } catch (err) { alert("Microphone access denied. Check permissions."); }
-            } else { mediaRecorder.stop(); mediaRecorder.stream.getTracks().forEach(track => track.stop()); isRecording = false; micBtnEl.classList.remove('bg-red-600', 'animate-pulse'); micBtnEl.classList.add('bg-[#00A884]'); micBtnEl.innerHTML = '<span class="text-white text-xl">🎤</span>'; }
+            } else {
+                mediaRecorder.stop();
+                mediaRecorder.stream.getTracks().forEach(track => track.stop());
+                isRecording = false;
+                micBtnEl.classList.remove('bg-red-600', 'animate-pulse');
+                micBtnEl.classList.add('bg-[#00A884]');
+                micBtnEl.innerHTML = '<span class="text-white text-xl">🎤</span>';
+            }
         });
 
         document.getElementById('chat-header-pic').addEventListener('click', () => openProfileScreen(currentActiveChatUser));
         document.getElementById('chat-header-info').addEventListener('click', () => openProfileScreen(currentActiveChatUser));
         document.getElementById('back-btn').addEventListener('click', () => {
-            if(currentChatListener) currentChatListener(); if(typingListener) typingListener(); if(userStatusListener) userStatusListener();
-            if(activeChatId && currentUser) setDoc(doc(db, "chats", activeChatId), { typing: { [currentUser.uid]: false } }, { merge: true }).catch(()=>{});
-            activeChatId = null; currentActiveChatUser = null; localStorage.removeItem('veyra_active_user'); showScreen('main');
+            if (currentChatListener) currentChatListener();
+            if (typingListener) typingListener();
+            if (userStatusListener) userStatusListener();
+            if (activeChatId && currentUser) setDoc(doc(db, "chats", activeChatId), { typing: { [currentUser.uid]: false } }, { merge: true }).catch(() => {});
+            activeChatId = null;
+            currentActiveChatUser = null;
+            localStorage.removeItem('veyra_active_user');
+            showScreen('main');
         });
 
-        document.getElementById('attach-btn').addEventListener('click', () => { if(!IMGBB_API_KEY) return; document.getElementById('media-input').click(); });
+        document.getElementById('attach-btn').addEventListener('click', () => {
+            if (!IMGBB_API_KEY) return;
+            document.getElementById('media-input').click();
+        });
+
         document.getElementById('media-input').addEventListener('change', async (e) => {
-            const file = e.target.files[0]; if(!file || !activeChatId || !currentActiveChatUser) return; e.target.value = ""; 
-            const uploadingBanner = document.getElementById('uploading-banner'); uploadingBanner.textContent = "Uploading photo via ImgBB..."; uploadingBanner.classList.remove('hidden');
+            const file = e.target.files[0];
+            if (!file || !activeChatId || !currentActiveChatUser) return;
+            e.target.value = "";
+            const uploadingBanner = document.getElementById('uploading-banner');
+            uploadingBanner.textContent = "Uploading photo via ImgBB...";
+            uploadingBanner.classList.remove('hidden');
             try {
-                const formData = new FormData(); formData.append("image", file);
-                const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method: "POST", body: formData }); const data = await response.json();
-                if(data.success) {
-                    const downloadURL = data.data.url; const timerEl = document.getElementById('disappearing-timer'); const timer = timerEl ? timerEl.value : "off";
+                const formData = new FormData();
+                formData.append("image", file);
+                const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method: "POST", body: formData });
+                const data = await response.json();
+                if (data.success) {
+                    const downloadURL = data.data.url;
+                    const timerEl = document.getElementById('disappearing-timer');
+                    const timer = timerEl ? timerEl.value : "off";
                     await addDoc(collection(db, `chats/${activeChatId}/messages`), { text: "", mediaUrl: downloadURL, mediaType: 'image', senderUid: currentUser.uid, timer: timer, isRead: false, timestamp: serverTimestamp() });
-                    await setDoc(doc(db, `users/${currentUser.uid}/inbox/${currentActiveChatUser.uid}`), { uid: currentActiveChatUser.uid, name: currentActiveChatUser.name || "User", username: currentActiveChatUser.username, photoUrl: currentActiveChatUser.photoUrl || "", lastMessage: "📷 Photo", lastSenderId: currentUser.uid, isRead: true, timestamp: serverTimestamp() }, {merge: true});
-                    await setDoc(doc(db, `users/${currentActiveChatUser.uid}/inbox/${currentUser.uid}`), { uid: currentUser.uid, name: currentUserData.name || "User", username: currentUserData.username, photoUrl: currentUserData.photoUrl || "", lastMessage: "📷 Photo", lastSenderId: currentUser.uid, isRead: false, timestamp: serverTimestamp() }, {merge: true});
+                    await setDoc(doc(db, `users/${currentUser.uid}/inbox/${currentActiveChatUser.uid}`), { uid: currentActiveChatUser.uid, name: currentActiveChatUser.name || "User", username: currentActiveChatUser.username, photoUrl: currentActiveChatUser.photoUrl || "", lastMessage: "📷 Photo", lastSenderId: currentUser.uid, isRead: true, timestamp: serverTimestamp() }, { merge: true });
+                    await setDoc(doc(db, `users/${currentActiveChatUser.uid}/inbox/${currentUser.uid}`), { uid: currentUser.uid, name: currentUserData.name || "User", username: currentUserData.username, photoUrl: currentUserData.photoUrl || "", lastMessage: "📷 Photo", lastSenderId: currentUser.uid, isRead: false, timestamp: serverTimestamp() }, { merge: true });
                     await setDoc(doc(db, `users/${currentActiveChatUser.uid}/activity/${currentUser.uid}_msg`), { type: 'new_message', uid: currentUser.uid, username: currentUserData.username, photoUrl: currentUserData.photoUrl || "", timestamp: serverTimestamp() });
                 } else { alert("Image upload failed."); }
-            } catch(error) { alert("Upload error."); } finally { uploadingBanner.classList.add('hidden'); }
+            } catch (error) { alert("Upload error."); }
+            finally { uploadingBanner.classList.add('hidden'); }
         });
 
         sendBtnEl.addEventListener('click', async () => {
-            const text = msgInputEl.value.trim(); const timerEl = document.getElementById('disappearing-timer'); const timer = timerEl ? timerEl.value : "off";
+            const text = msgInputEl.value.trim();
+            const timerEl = document.getElementById('disappearing-timer');
+            const timer = timerEl ? timerEl.value : "off";
             if (!text || !activeChatId || !currentActiveChatUser) return;
-            msgInputEl.value = ""; sendBtnEl.classList.add('hidden'); micBtnEl.classList.remove('hidden');
-            setDoc(doc(db, "chats", activeChatId), { typing: { [currentUser.uid]: false } }, { merge: true }).catch(()=>{});
-            clearTimeout(typingTimeout); setOnlineStatus(); 
+            msgInputEl.value = "";
+            sendBtnEl.classList.add('hidden');
+            micBtnEl.classList.remove('hidden');
+            setDoc(doc(db, "chats", activeChatId), { typing: { [currentUser.uid]: false } }, { merge: true }).catch(() => {});
+            clearTimeout(typingTimeout);
+            setOnlineStatus();
             try {
                 await addDoc(collection(db, `chats/${activeChatId}/messages`), { text: text, senderUid: currentUser.uid, timer: timer, isRead: false, timestamp: serverTimestamp() });
-                await setDoc(doc(db, `users/${currentUser.uid}/inbox/${currentActiveChatUser.uid}`), { uid: currentActiveChatUser.uid, name: currentActiveChatUser.name || "User", username: currentActiveChatUser.username || "unknown", photoUrl: currentActiveChatUser.photoUrl || "", lastMessage: text, lastSenderId: currentUser.uid, isRead: true, timestamp: serverTimestamp() }, {merge: true});
-                await setDoc(doc(db, `users/${currentActiveChatUser.uid}/inbox/${currentUser.uid}`), { uid: currentUser.uid, name: currentUserData.name || "User", username: currentUserData.username || "unknown", photoUrl: currentUserData.photoUrl || "", lastMessage: text, lastSenderId: currentUser.uid, isRead: false, timestamp: serverTimestamp() }, {merge: true});
+                await setDoc(doc(db, `users/${currentUser.uid}/inbox/${currentActiveChatUser.uid}`), { uid: currentActiveChatUser.uid, name: currentActiveChatUser.name || "User", username: currentActiveChatUser.username || "unknown", photoUrl: currentActiveChatUser.photoUrl || "", lastMessage: text, lastSenderId: currentUser.uid, isRead: true, timestamp: serverTimestamp() }, { merge: true });
+                await setDoc(doc(db, `users/${currentActiveChatUser.uid}/inbox/${currentUser.uid}`), { uid: currentUser.uid, name: currentUserData.name || "User", username: currentUserData.username || "unknown", photoUrl: currentUserData.photoUrl || "", lastMessage: text, lastSenderId: currentUser.uid, isRead: false, timestamp: serverTimestamp() }, { merge: true });
                 await setDoc(doc(db, `users/${currentActiveChatUser.uid}/activity/${currentUser.uid}_msg`), { type: 'new_message', uid: currentUser.uid, username: currentUserData.username || "unknown", photoUrl: currentUserData.photoUrl || "", timestamp: serverTimestamp() });
-            } catch(e) { alert("Message failed to send: " + e.message); }
+            } catch (e) { alert("Message failed to send: " + e.message); }
         });
 
         msgInputEl.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendBtnEl.click(); });
 
         function loadPrivateMessages() {
-            const messagesArea = document.getElementById('messages-area'); const q = query(collection(db, `chats/${activeChatId}/messages`), orderBy("timestamp", "asc"));
-            if(currentChatListener) currentChatListener();
+            const messagesArea = document.getElementById('messages-area');
+            const q = query(collection(db, `chats/${activeChatId}/messages`), orderBy("timestamp", "asc"));
+            if (currentChatListener) currentChatListener();
             currentChatListener = onSnapshot(q, (snapshot) => {
-                messagesArea.innerHTML = ""; 
+                messagesArea.innerHTML = "";
                 snapshot.forEach((docSnap) => {
-                    const msg = docSnap.data(); const msgId = docSnap.id; const isMe = msg.senderUid === currentUser.uid; const msgRef = doc(db, `chats/${activeChatId}/messages`, msgId);
-                    if (!isMe && !msg.isRead) { updateDoc(msgRef, { isRead: true }).catch(e=>{}); if (msg.timer === "view-once") setTimeout(() => { deleteDoc(msgRef).catch(e=>{}); }, 10000); }
-                    if (msg.timer === "7-hours" || msg.timer === "24-hours") {
-                        const hours = msg.timer === "7-hours" ? 7 : 24; const msgTime = msg.timestamp ? msg.timestamp.toMillis() : Date.now();
-                        if (Date.now() - msgTime > hours * 60 * 60 * 1000) { deleteDoc(msgRef).catch(e=>{}); return; }
+                    const msg = docSnap.data();
+                    const msgId = docSnap.id;
+                    const isMe = msg.senderUid === currentUser.uid;
+                    const msgRef = doc(db, `chats/${activeChatId}/messages`, msgId);
+
+                    if (!isMe && !msg.isRead) {
+                        updateDoc(msgRef, { isRead: true }).catch(() => {});
+                        if (msg.timer === "view-once") setTimeout(() => { deleteDoc(msgRef).catch(() => {}); }, 10000);
                     }
-                    const timerIcon = msg.timer && msg.timer !== "off" ? "⏱️" : ""; const tickColor = msg.isRead ? "text-[#34B7F1]" : "text-gray-400"; const ticksHtml = isMe ? `<span class="${tickColor} font-bold text-xs tracking-tighter">✓✓</span>` : '';
+                    if (msg.timer === "7-hours" || msg.timer === "24-hours") {
+                        const hours = msg.timer === "7-hours" ? 7 : 24;
+                        const msgTime = msg.timestamp ? msg.timestamp.toMillis() : Date.now();
+                        if (Date.now() - msgTime > hours * 60 * 60 * 1000) {
+                            deleteDoc(msgRef).catch(() => {});
+                            return;
+                        }
+                    }
+
+                    const timerIcon = msg.timer && msg.timer !== "off" ? "⏱️" : "";
+                    const tickColor = msg.isRead ? "text-[#34B7F1]" : "text-gray-400";
+                    const ticksHtml = isMe ? `<span class="${tickColor} font-bold text-xs tracking-tighter">✓✓</span>` : '';
                     let mediaHtml = '';
                     if (msg.mediaUrl) {
-                        if(msg.mediaType === 'audio') { mediaHtml = `<audio src="${msg.mediaUrl}" controls class="w-[200px] sm:w-[240px] mb-1"></audio>`; } 
-                        else { mediaHtml = `<img src="${msg.mediaUrl}" class="w-full max-w-[250px] rounded-lg mb-1 object-cover cursor-pointer">`; }
+                        if (msg.mediaType === 'audio') {
+                            mediaHtml = `<audio src="${msg.mediaUrl}" controls class="voice-note-player w-[200px] sm:w-[240px] mb-1"></audio>`;
+                        } else {
+                            mediaHtml = `<img src="${msg.mediaUrl}" class="w-full max-w-[250px] rounded-lg mb-1 object-cover cursor-pointer">`;
+                        }
                     }
-                    const div = document.createElement('div'); div.className = isMe ? "self-end max-w-[80%] bg-[#005C4B] text-white rounded-lg p-2 rounded-tr-none shadow-md" : "self-start max-w-[80%] bg-[#202C33] text-white rounded-lg p-2 rounded-tl-none shadow-md";
-                    if(msg.text === "" && msg.mediaUrl) { div.innerHTML = `${mediaHtml}<div class="flex justify-end mt-1 text-[10px] items-center gap-1"><span>${timerIcon}</span>${ticksHtml}</div>`; } 
-                    else { div.innerHTML = `${mediaHtml}<p class="text-sm">${msg.text}</p><div class="flex justify-end mt-1 text-[10px] items-center gap-1"><span>${timerIcon}</span>${ticksHtml}</div>`; }
+                    const div = document.createElement('div');
+                    div.className = isMe
+                        ? "self-end max-w-[80%] bg-[#005C4B] text-white rounded-lg p-2 rounded-tr-none shadow-md"
+                        : "self-start max-w-[80%] bg-[#202C33] text-white rounded-lg p-2 rounded-tl-none shadow-md";
+                    if (msg.text === "" && msg.mediaUrl) {
+                        div.innerHTML = `${mediaHtml}<div class="flex justify-end mt-1 text-[10px] items-center gap-1"><span>${timerIcon}</span>${ticksHtml}</div>`;
+                    } else {
+                        div.innerHTML = `${mediaHtml}<p class="text-sm">${msg.text}</p><div class="flex justify-end mt-1 text-[10px] items-center gap-1"><span>${timerIcon}</span>${ticksHtml}</div>`;
+                    }
                     messagesArea.appendChild(div);
                 });
                 messagesArea.scrollTop = messagesArea.scrollHeight;
@@ -902,7 +1304,6 @@
         document.getElementById('nav-chats').addEventListener('click', () => showScreen('main'));
         document.getElementById('settings-back-btn').addEventListener('click', () => showScreen('main'));
         document.getElementById('main-menu-btn').addEventListener('click', () => showScreen('settings'));
-        
     </script>
 </body>
 </html>
